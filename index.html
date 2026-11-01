@@ -1,0 +1,1392 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checklist administrativo</title>
+<style>
+:root{
+  --navy:#0b2a4a;--navy2:#143e6b;--blue:#2f6db5;--blue-l:#e8f0fa;--blue-xl:#f5f8fc;
+  --green:#1e9e5a;--green-l:#e3f6ec;--orange:#e8890c;--orange-l:#fdf0dc;--red:#d64545;--red-l:#fbe6e6;
+  --gray:#e5e9f0;--gray-d:#66758b;--text:#14233a;--bg:#fafbfd;--card:#fff;--r:14px;
+  --sh:0 1px 2px rgba(11,42,74,.06),0 6px 18px rgba(11,42,74,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,h4{margin:0}
+svg.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.muted{color:var(--gray-d)}
+.small{font-size:12.5px}
+[hidden]{display:none!important}
+
+/* Cabecera */
+.top{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:16px 16px 18px}
+.top-in{max-width:1000px;margin:0 auto}
+.top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.brand{display:flex;gap:10px;align-items:center;font-weight:700;font-size:18px;letter-spacing:.2px}
+.brand .ic{width:26px;height:26px}
+.clock{text-align:right}
+.clock .t{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.clock .d{font-size:13px;opacity:.85;text-transform:capitalize}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 12px;min-width:0}
+.stat .l{font-size:12px;opacity:.8}
+.stat .v{font-size:22px;font-weight:700;line-height:1.2}
+.stat .v.sm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat.wide{grid-column:span 2}
+.bar{height:8px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:#35d07f;border-radius:99px;transition:width .5s ease}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;border-radius:10px;padding:8px 14px;font-weight:600;background:var(--blue);color:#fff;transition:transform .08s,background .15s,box-shadow .15s}
+.btn:hover{background:#2560a6}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--navy)}
+.btn.primary:hover{background:var(--navy2)}
+.btn.ghost{background:#fff;color:var(--navy);border-color:var(--gray)}
+.btn.ghost:hover{background:var(--blue-xl)}
+.btn.danger{background:var(--red)}
+.btn.danger:hover{background:#b93636}
+.btn.ok{background:var(--green)}
+.btn.light{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff}
+.btn.light:hover{background:rgba(255,255,255,.24)}
+.btn.light.on{background:#fff;color:var(--navy)}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+.btn:focus-visible,.chk:focus-visible,.tab:focus-visible,.ibtn:focus-visible{outline:3px solid #8bb8ee;outline-offset:2px}
+.ibtn{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--gray);border-radius:9px;padding:5px 9px;color:var(--navy);font-size:13px;font-weight:600}
+.ibtn:hover{background:var(--blue-l)}
+.ibtn.on{background:var(--blue-l);border-color:#b7cfee}
+
+/* Navegación */
+.nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--gray);box-shadow:0 2px 8px rgba(11,42,74,.04)}
+.nav-in{max-width:1000px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 12px;font-weight:600;color:var(--gray-d);display:flex;align-items:center;gap:7px;white-space:nowrap;border-bottom:3px solid transparent}
+.tab:hover{color:var(--navy)}
+.tab.on{color:var(--navy);border-bottom-color:var(--navy)}
+.pill{background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px;font-weight:700}
+.pill.o{background:var(--orange)}
+
+main{max-width:1000px;margin:0 auto;padding:16px}
+#banners{max-width:1000px;margin:0 auto;padding:12px 16px 0}
+.banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-radius:12px;margin-bottom:10px;border:1px solid;font-size:14px}
+.banner.info{background:var(--blue-l);border-color:#c5d8f1}
+.banner.warn{background:var(--orange-l);border-color:#f3d3a0}
+.banner.err{background:var(--red-l);border-color:#efbcbc}
+.banner .sp{flex:1;min-width:180px}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input[type=search],.toolbar select,.inp{border:1px solid var(--gray);border-radius:10px;padding:8px 11px;background:#fff;min-width:0}
+.toolbar input[type=search]{flex:1;min-width:160px}
+.inp:focus,.toolbar input:focus,.toolbar select:focus,textarea:focus{outline:2px solid #8bb8ee;border-color:#8bb8ee}
+.chkline{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--gray-d)}
+
+/* Tarjetas / tareas */
+.card{background:var(--card);border:1px solid var(--gray);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:14px;overflow:hidden}
+.card>.ch{padding:12px 16px;border-bottom:1px solid var(--gray);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--blue-xl)}
+.card>.ch h3{font-size:15px;color:var(--navy)}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--gray);border-left:4px solid var(--gray);animation:fade .25s ease}
+.task:last-child{border-bottom:0}
+.task.s-completada{border-left-color:var(--green);background:#fbfefc}
+.task.s-vencida{border-left-color:var(--red);background:#fffafa}
+.task.s-seguimiento{border-left-color:var(--orange);background:#fffcf7}
+.task.s-en_curso{border-left-color:var(--blue)}
+.task.s-pendiente{border-left-color:#b9c6d8}
+.task.future{opacity:.7}
+.task.done .t-name{text-decoration:line-through;color:var(--gray-d)}
+.chk{width:28px;height:28px;border-radius:9px;border:2px solid #9fb2cb;background:#fff;display:grid;place-items:center;color:#fff;padding:0;transition:all .15s}
+.chk:hover{border-color:var(--navy)}
+.chk[aria-checked=true]{background:var(--green);border-color:var(--green)}
+.chk .ic{width:18px;height:18px;stroke-width:3}
+.t-name{font-weight:600}
+.t-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.t-last{font-size:13px;color:var(--gray-d);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.t-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.b{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:99px;padding:2px 9px;background:var(--gray);color:var(--gray-d)}
+.b.green{background:var(--green-l);color:#157a45}
+.b.orange{background:var(--orange-l);color:#a85f00}
+.b.red{background:var(--red-l);color:#a82f2f}
+.b.blue{background:var(--blue-l);color:var(--blue)}
+.b.navy{background:var(--navy);color:#fff}
+.empty{padding:34px 16px;text-align:center;color:var(--gray-d)}
+.sub{padding:8px 16px;font-size:12.5px;color:var(--gray-d);background:#fff;border-bottom:1px solid var(--gray)}
+details.month{margin-bottom:14px}
+details.month>summary{list-style:none;cursor:pointer;padding:12px 16px;background:#fff;border:1px solid var(--gray);border-radius:var(--r);font-weight:700;color:var(--navy);display:flex;justify-content:space-between;gap:8px;align-items:center}
+details.month[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0}
+details.month>summary::-webkit-details-marker{display:none}
+details.month .card{border-top-left-radius:0;border-top-right-radius:0;margin-bottom:0;border-top:0}
+
+/* Recordatorios */
+.rem{padding:14px 16px;border-bottom:1px solid var(--gray);border-left:4px solid var(--gray);animation:fade .25s ease}
+.rem:last-child{border-bottom:0}
+.rem.p-alta{border-left-color:var(--red)}.rem.p-media{border-left-color:var(--blue)}.rem.p-baja{border-left-color:#b9c6d8}
+.rem.alerting{background:var(--red-l)}
+.rem.off{opacity:.65}
+.rem h4{font-size:15.5px}
+.rem .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* Historial / config */
+.hist{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 16px;border-bottom:1px solid var(--gray);font-size:14px}
+.hist:last-child{border-bottom:0}
+.hist .when{color:var(--gray-d);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sec{padding:16px}
+.sec h4{color:var(--navy);margin-bottom:8px}
+.def{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:9px 16px;border-bottom:1px solid var(--gray)}
+.def:last-child{border-bottom:0}
+.def.arch{opacity:.6}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label.fld{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px}
+label.fld>input,label.fld>select,label.fld>textarea{display:block;width:100%;margin-top:5px;border:1px solid var(--gray);border-radius:10px;padding:9px 11px;background:#fff;font-weight:400}
+textarea{resize:vertical}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days label{display:flex;gap:4px;align-items:center;border:1px solid var(--gray);border-radius:9px;padding:5px 9px;font-size:13px;background:#fff}
+.note{background:var(--blue-xl);border:1px solid var(--gray);border-radius:10px;padding:10px 12px;font-size:13.5px;color:#34465f}
+
+/* Modales */
+.overlay{position:fixed;inset:0;background:rgba(11,42,74,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:12px;animation:fade .18s ease}
+.modal{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;animation:pop .2s ease}
+.modal.wide{max-width:760px}
+.m-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--gray)}
+.m-head h3{font-size:17px;color:var(--navy)}
+.x{border:0;background:none;color:var(--gray-d);border-radius:8px;padding:4px;display:grid;place-items:center}
+.x:hover{background:var(--gray)}
+.m-body{padding:16px 18px;overflow:auto}
+.m-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--gray);flex-wrap:wrap}
+.m-foot:empty{display:none}
+.err{background:var(--red-l);color:#a82f2f;border-radius:9px;padding:8px 11px;font-size:13.5px;margin-top:6px;animation:shake .3s}
+.cm{border:1px solid var(--gray);border-radius:12px;padding:10px 12px;margin-top:10px;background:#fff}
+.cm .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--gray-d)}
+.cm .tx{white-space:pre-wrap;margin:6px 0;word-break:break-word}
+.cm .a{display:flex;gap:6px;flex-wrap:wrap}
+.cm-new textarea{width:100%;border:1px solid var(--gray);border-radius:10px;padding:9px 11px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+
+/* Alerta a pantalla casi completa */
+.alert-ov{position:fixed;inset:0;z-index:3000;background:rgba(8,24,44,.82);display:flex;align-items:center;justify-content:center;padding:12px}
+.alert{background:#fff;border-radius:20px;width:min(94vw,880px);min-height:min(78vh,620px);max-height:94vh;overflow:auto;display:flex;flex-direction:column;border-top:12px solid var(--blue);box-shadow:0 30px 90px rgba(0,0,0,.5);animation:pop .25s ease}
+.alert.p-alta{border-top-color:var(--red)}.alert.p-baja{border-top-color:#9fb2cb}.alert.bind{border-top-color:var(--orange)}
+.alert .a-head{padding:22px 28px 6px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.alert h2{font-size:clamp(24px,5vw,40px);line-height:1.15;color:var(--navy);padding:0 28px;word-break:break-word}
+.alert .a-desc{padding:12px 28px;font-size:clamp(16px,2.4vw,20px);white-space:pre-wrap;flex:1}
+.alert .a-when{padding:0 28px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.alert .a-foot{padding:18px 28px 22px;border-top:1px solid var(--gray);background:var(--blue-xl)}
+.alert .a-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.alert .btn.big{font-size:18px;padding:13px 22px}
+.alert .esc{margin-top:12px;font-size:12px}
+.alert .esc button{background:none;border:0;color:var(--gray-d);text-decoration:underline;padding:0;font-size:12px}
+.alert-chip{position:fixed;right:12px;bottom:12px;z-index:3000}
+#toasts{position:fixed;left:0;right:0;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:4000;pointer-events:none}
+.toast{background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:pop .2s ease;max-width:92vw;pointer-events:auto}
+.toast.err{background:var(--red)}.toast.ok{background:var(--green)}
+
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:640px){
+  .lbl{display:none}
+  .stat.wide{grid-column:span 2}
+  .clock .t{font-size:22px}
+  .task{grid-template-columns:auto 1fr;}
+  .task .t-act{grid-column:1 / -1;justify-content:flex-start}
+  main{padding:12px}
+}
+body.focus .stats .opt{display:none}
+
+/* Cajón desplegable de estados */
+.drawer{background:var(--blue-xl);border-bottom:1px solid var(--gray);border-left:4px solid var(--navy);padding:12px 16px 14px;animation:drawer .22s ease;transform-origin:top}
+.drawer .dh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-weight:700;color:var(--navy);font-size:14px}
+.drawer .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.opt-st{display:flex;align-items:center;gap:8px;border:2px solid var(--gray);background:#fff;border-radius:11px;padding:10px 12px;font-weight:600;text-align:left}
+.opt-st i{width:12px;height:12px;border-radius:50%;background:#b9c6d8;flex:none}
+.opt-st.s-en_curso i{background:var(--blue)}.opt-st.s-seguimiento i{background:var(--orange)}.opt-st.s-completada i{background:var(--green)}
+.opt-st:hover{border-color:var(--navy)}
+.opt-st.cur{border-color:var(--navy);background:var(--blue-l);cursor:default}
+.drawer .hint{font-size:12.5px;color:var(--gray-d);margin-top:8px}
+.chk{position:relative}
+@keyframes drawer{from{opacity:0;transform:scaleY(.85)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="top-row">
+    <div class="brand"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg> Checklist administrativo</div>
+    <div class="clock"><div class="t" id="clockT">--:--:--</div><div class="d" id="clockD"></div></div>
+  </div>
+  <div class="stats">
+    <div class="stat wide"><div class="l">Checklist diario completado</div><div class="v" id="stPct">0%</div><div class="bar"><i id="stBar" style="width:0%"></i></div></div>
+    <div class="stat"><div class="l">Pendientes</div><div class="v" id="stPend">0</div></div>
+    <div class="stat"><div class="l">Vencidas</div><div class="v" id="stOver">0</div></div>
+    <div class="stat wide opt"><div class="l">Próximo recordatorio</div><div class="v sm" id="stNext">—</div></div>
+  </div>
+  <div class="top-actions">
+    <button class="btn light" data-top="newRem"></button>
+    <button class="btn light" data-top="summary"></button>
+    <button class="btn light" data-top="focus" id="btnFocus"></button>
+  </div>
+</div></header>
+<div id="banners"></div>
+<nav class="nav"><div class="nav-in" id="nav" role="tablist"></div></nav>
+<main id="main"></main>
+<div id="modalRoot"></div>
+<div id="alertRoot"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   ARQUITECTURA (un solo archivo, secciones):
+   1) Utilidades   2) Base de datos (IndexedDB)   3) Estado y persistencia
+   4) Reglas (estados, períodos, vencimientos)  5) Historial
+   6) Interfaz base (modales, avisos)  7) Vistas  8) Comentarios
+   9) Recordatorios y alertas  10) Configuración, respaldos  11) Arranque
+   ========================================================= */
+
+/* ---------- 1) Utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+let clock = () => Date.now();
+const nowTs = () => clock();
+const nowD = () => new Date(clock());
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const ymOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const daysIn = (y, m) => new Date(y, m + 1, 0).getDate();
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const toMin = hhmm => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+const hhmm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
+const snippet = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
+const fmtTime = ts => { const d = new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const fmtDay = s => { const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; };
+const fmtDT = ts => { const d = new Date(ts); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${fmtTime(ts)}`; };
+const monthLabel = p => { const [y, m] = p.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('es-AR', {month: 'long', year: 'numeric'}); };
+function fmtWhen(ts) {
+  const d = new Date(ts), t = nowD(), a = ymd(d), b = ymd(t);
+  const tm = new Date(t); tm.setDate(tm.getDate() + 1);
+  if (a === b) return `hoy ${fmtTime(ts)}`;
+  if (a === ymd(tm)) return `mañana ${fmtTime(ts)}`;
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${fmtTime(ts)}`;
+}
+const DOW = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const PRI = {baja: 1, media: 2, alta: 3};
+const STATUS = {
+  pendiente: {label: 'Pendiente', cls: ''},
+  en_curso: {label: 'En curso', cls: 'blue'},
+  completada: {label: 'Completada', cls: 'green'},
+  seguimiento: {label: 'Requiere seguimiento', cls: 'orange'},
+  vencida: {label: 'Vencida', cls: 'red'}
+};
+const ICONS = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  chat: '<path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+  bell: '<path d="M18 16v-5a6 6 0 1 0-12 0v5l-2 2h16z"/><path d="M10 21h4"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  calendar: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  home: '<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+  alert: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  focus: '<circle cx="12" cy="12" r="3"/><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/>',
+  download: '<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
+  upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+  archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11h14V8M10 12h4"/>',
+  restore: '<path d="M4 12a8 8 0 1 0 3-6M4 4v5h5"/>',
+  up: '<path d="M6 14l6-6 6 6"/>',
+  down: '<path d="M6 10l6 6 6-6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+
+/* ---------- 2) Base de datos (IndexedDB) ---------- */
+const STORES = ['taskDefs', 'instances', 'comments', 'reminders', 'history', 'meta'];
+const DB = {
+  db: null, ok: false,
+  open() {
+    return new Promise(res => {
+      try {
+        const req = indexedDB.open('checklist-admin-v1', 1);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          STORES.forEach(s => { if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, {keyPath: s === 'meta' ? 'key' : 'id'}); });
+        };
+        req.onsuccess = e => { this.db = e.target.result; this.ok = true; res(true); };
+        req.onerror = () => res(false);
+        req.onblocked = () => res(false);
+      } catch (err) { res(false); }
+    });
+  },
+  getAll(s) { return new Promise((res, rej) => { const r = this.db.transaction(s, 'readonly').objectStore(s).getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
+  _w(s, fn) {
+    if (!this.ok) return Promise.resolve();
+    return new Promise((res, rej) => { const t = this.db.transaction(s, 'readwrite'); fn(t.objectStore(s)); t.oncomplete = () => res(); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); });
+  },
+  put(s, o) { return this._w(s, os => os.put(o)); },
+  putMany(s, arr) { return this._w(s, os => arr.forEach(o => os.put(o))); },
+  del(s, id) { return this._w(s, os => os.delete(id)); },
+  replaceAll(d) {
+    if (!this.ok) return Promise.resolve();
+    return new Promise((res, rej) => {
+      const t = this.db.transaction(STORES, 'readwrite');
+      STORES.forEach(s => { const os = t.objectStore(s); os.clear(); (d[s] || []).forEach(o => os.put(o)); });
+      t.oncomplete = () => res(); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+    });
+  }
+};
+let bc = null;
+try { if (typeof BroadcastChannel !== 'undefined') bc = new BroadcastChannel('checklist-admin'); } catch (e) {}
+const broadcast = () => { try { bc && bc.postMessage('changed'); } catch (e) {} };
+
+/* ---------- 3) Estado y persistencia ---------- */
+const S = {defs: [], inst: [], comments: [], rems: [], hist: [], meta: {}, ids: new Set()};
+const RT = {day: null, minute: null, bindAlert: null, bindRemindAt: 0, suppressUntil: 0, alertKey: '', lastErr: 0, storageOk: true};
+const UI = {view: 'daily', built: null, drawer: null, q: '', filter: 'all', hideDone: false, focus: false, remFilter: 'active', hist: {day: '', month: '', task: '', type: '', q: '', limit: 200}};
+
+const DEFAULT_SETTINGS = () => ({
+  bind: {start: '09:00', end: '17:00', days: [1, 2, 3, 4, 5], interval: 60, pending: 'grouped'},
+  snooze: [5, 15, 30], snoozeCustom: 10, sound: true, sysNotif: false, holidays: []
+});
+const cfg = () => S.meta.settings;
+const DAILY_SEED = ['Apertura del día y baja de avales vencidos', 'Cobro de cheques vencidos', 'Chequear cheques rechazados Interbanking', 'Imprimir checklist y empezar proceso de cheques rechazados', 'Revisar recepción de mail de cuotas', 'Revisar comprobantes faltantes de cuotas', 'Revisar cartas documento y revisar fechas de vencimiento de cuotas', 'Chequear movimientos del BIND cada hora'];
+const MONTHLY_SEED = ['Conciliación del BIND y carga de impuestos', 'Conciliación de suscripciones y rescates', 'Rentas y amortizaciones', 'Boletos', 'Gastos bancarios'];
+
+function save(store, obj) {
+  return DB.put(store, obj).then(broadcast).catch(e => { toast('No se pudo guardar: ' + ((e && e.message) || e), 'err'); });
+}
+function saveMany(store, arr) {
+  return DB.putMany(store, arr).then(broadcast).catch(e => { toast('No se pudo guardar: ' + ((e && e.message) || e), 'err'); });
+}
+function remove(store, id) { return DB.del(store, id).then(broadcast).catch(() => {}); }
+function setMeta(key, value) { S.meta[key] = value; return save('meta', {key, value}); }
+const saveSettings = () => setMeta('settings', cfg());
+function reindex() { S.ids = new Set(S.inst.map(i => i.id)); }
+
+async function loadState() {
+  let rows = STORES.map(() => []);
+  if (DB.ok) rows = await Promise.all(STORES.map(s => DB.getAll(s)));
+  const [defs, inst, com, rem, hist, meta] = rows;
+  S.defs = defs.sort((a, b) => a.order - b.order);
+  S.inst = inst; S.comments = com; S.rems = rem;
+  S.hist = hist.sort((a, b) => a.ts - b.ts);
+  S.meta = {};
+  meta.forEach(m => { S.meta[m.key] = m.value; });
+  const d = DEFAULT_SETTINGS(), s = S.meta.settings || {};
+  S.meta.settings = Object.assign(d, s, {bind: Object.assign(d.bind, s.bind || {})});
+  reindex();
+}
+async function seedIfNeeded() {
+  if (S.meta.seeded) return;
+  const mk = (id, type, name, order, special) => ({id, type, name, order, archived: false, special: special || null, due: {mode: 'none', day: 1}, createdMonth: ymOf(nowD())});
+  const defs = DAILY_SEED.map((n, k) => mk('D' + (k + 1), 'daily', n, k + 1, k === 7 ? 'bind' : null))
+    .concat(MONTHLY_SEED.map((n, k) => mk('M' + (k + 1), 'monthly', n, k + 1)));
+  S.defs = defs;
+  await saveMany('taskDefs', defs);
+  await saveSettings();
+  await setMeta('seeded', true);
+}
+
+/* ---------- 4) Reglas: períodos, estados, vencimientos ---------- */
+const defOf = i => S.defs.find(d => d.id === i.defId);
+const visible = i => { const d = defOf(i); return !!d && !d.archived; };
+function bindSlots() {
+  const b = cfg().bind, out = [];
+  for (let m = toMin(b.start); m <= toMin(b.end); m += b.interval) out.push(hhmm(m));
+  return out;
+}
+function lastDayOf(p) { const [y, m] = p.split('-').map(Number); return daysIn(y, m - 1); }
+function computeDue(def, period) {
+  const o = def.due || {mode: 'none'}, [y, m] = period.split('-').map(Number), last = daysIn(y, m - 1);
+  if (o.mode === 'day') return `${period}-${pad(Math.min(Math.max(1, o.day | 0), last))}`;
+  if (o.mode === 'last') return `${period}-${pad(last)}`;
+  if (o.mode === 'lastbiz') {
+    const hol = new Set(cfg().holidays);
+    let d = last;
+    while (d > 1) { const dt = new Date(y, m - 1, d), k = `${period}-${pad(d)}`; if (dt.getDay() !== 0 && dt.getDay() !== 6 && !hol.has(k)) break; d--; }
+    return `${period}-${pad(d)}`;
+  }
+  return null; // 'none' y 'custom': nunca se asigna automáticamente
+}
+function newInstance(def, period, slot) {
+  return {
+    id: `${def.id}|${period}|${slot || ''}`, defId: def.id, type: def.type, period, slot: slot || '', name: def.name,
+    status: 'pendiente', completedAt: null, due: def.type === 'monthly' ? computeDue(def, period) : null,
+    dueManual: false, createdAt: nowTs(), alerted: false
+  };
+}
+function addInst(def, period, slot, bucket) {
+  const inst = newInstance(def, period, slot);
+  if (S.ids.has(inst.id)) return;
+  S.ids.add(inst.id); S.inst.push(inst); bucket.push(inst);
+}
+function monthsToGenerate(cur) {
+  const from = S.meta.lastMonth && S.meta.lastMonth < cur ? S.meta.lastMonth : cur, out = [];
+  let [y, m] = from.split('-').map(Number);
+  for (let k = 0; k < 12; k++) {
+    const p = `${y}-${pad(m)}`; out.push(p);
+    if (p >= cur) break;
+    m++; if (m > 12) { m = 1; y++; }
+  }
+  return out;
+}
+function ensurePeriods() {
+  const d = nowD(), today = ymd(d), cur = ymOf(d), added = [];
+  for (const def of S.defs) {
+    if (def.archived) continue;
+    if (def.type === 'daily') {
+      if (def.special === 'bind') { if (cfg().bind.days.includes(d.getDay())) bindSlots().forEach(s => addInst(def, today, s, added)); }
+      else addInst(def, today, '', added);
+    } else {
+      for (const p of monthsToGenerate(cur)) if (p >= (def.createdMonth || p)) addInst(def, p, '', added);
+    }
+  }
+  if (added.length) saveMany('instances', added);
+  if (S.meta.lastMonth !== cur) setMeta('lastMonth', cur);
+  return added.length;
+}
+function syncBindToday() {
+  const def = S.defs.find(d => d.special === 'bind'); if (!def) return;
+  const d = nowD(), today = ymd(d);
+  const want = (!def.archived && cfg().bind.days.includes(d.getDay())) ? bindSlots() : [];
+  const gone = S.inst.filter(i => i.defId === def.id && i.period === today && !want.includes(i.slot) && i.status !== 'completada' && !commentsOf('instance', i.id).length);
+  gone.forEach(i => { S.inst.splice(S.inst.indexOf(i), 1); S.ids.delete(i.id); remove('instances', i.id); });
+  const added = []; want.forEach(s => addInst(def, today, s, added));
+  if (added.length) saveMany('instances', added);
+}
+const slotTs = i => { const d = parseYmd(i.period); d.setHours(0, toMin(i.slot), 0, 0); return d.getTime(); };
+const isFuture = i => !!i.slot && i.period === ymd(nowD()) && slotTs(i) > nowTs();
+const countable = i => !isFuture(i);
+function isLate(i) { return i.type === 'daily' ? i.period < ymd(nowD()) : i.period < ymOf(nowD()); }
+function isOverdue(i) { return i.status !== 'completada' && (isLate(i) || !!(i.due && i.due < ymd(nowD()))); }
+function effStatus(i) {
+  if (i.status === 'completada') return {key: 'completada', label: 'Completada', cls: 'green'};
+  if (isOverdue(i)) return {key: 'vencida', label: 'Vencida', cls: 'red'};
+  if (i.status === 'seguimiento') return {key: 'seguimiento', label: 'Requiere seguimiento', cls: 'orange'};
+  if (i.status === 'en_curso') return {key: 'en_curso', label: 'En curso', cls: 'blue'};
+  return {key: 'pendiente', label: isFuture(i) ? 'Programada' : 'Pendiente', cls: ''};
+}
+const commentsOf = (kind, id) => S.comments.filter(c => c.parentKind === kind && c.parentId === id).sort((a, b) => b.createdAt - a.createdAt);
+const remsFor = i => S.rems.filter(r => (r.state === 'active' || r.state === 'snoozed') && (r.instId === i.id || (!r.instId && r.defId === i.defId)));
+const instTitle = i => i.slot ? `${i.name} · revisión ${i.slot}` : i.name;
+const cmpInst = (a, b) => ((defOf(a) || {}).order || 0) - ((defOf(b) || {}).order || 0) || a.slot.localeCompare(b.slot) || a.period.localeCompare(b.period);
+
+function computeStats() {
+  const today = ymd(nowD()), cur = ymOf(nowD());
+  const act = S.inst.filter(visible);
+  const todays = act.filter(i => i.type === 'daily' && i.period === today && countable(i));
+  const done = todays.filter(i => i.status === 'completada').length;
+  const open = act.filter(i => i.status !== 'completada' && countable(i));
+  return {
+    total: todays.length, done, pct: todays.length ? Math.round(done / todays.length * 100) : 0,
+    pending: open.filter(i => !isOverdue(i) && (i.period === today || i.period === cur)).length,
+    overdue: open.filter(isOverdue).length,
+    late: open.filter(i => isLate(i)).length
+  };
+}
+function nextReminder() {
+  const q = S.rems.filter(r => (r.state === 'active' || r.state === 'snoozed') && !r.alerting).sort((a, b) => a.nextAt - b.nextAt);
+  return q[0] || null;
+}
+
+/* Cambio de estado (sin código): se usa desde el cajón desplegable de cada tarea. */
+function applyStatus(i, ns) {
+  const old = i.status; if (old === ns) return;
+  i.status = ns;
+  i.completedAt = ns === 'completada' ? nowTs() : null;
+  save('instances', i);
+  const type = ns === 'completada' ? 'completada' : old === 'completada' ? 'reabierta' : 'estado';
+  log(type, {inst: i, detail: `${i.slot ? 'Revisión ' + i.slot + ': ' : ''}${STATUS[old].label} → ${STATUS[ns].label}`});
+  refresh();
+  /* Mensaje de confirmación después de cada cambio de estado */
+  toast(`✔ Estado actualizado: «${instTitle(i)}» → ${STATUS[ns].label}`, 'ok');
+}
+/* Cambio de estado desde el cajón desplegable (sin código) */
+function setStatus(i, ns) {
+  if (!STATUS[ns] || ns === 'vencida') return;
+  if (ns === i.status) { toast(`La tarea ya estaba en «${STATUS[ns].label}»`); return; }
+  applyStatus(i, ns);
+}
+
+/* ---------- 5) Historial (registro local, no auditoría inalterable) ---------- */
+const HTYPES = {
+  completada: 'Tarea completada', reabierta: 'Tarea reabierta', estado: 'Cambio de estado',
+  rem_creado: 'Recordatorio creado', rem_modificado: 'Recordatorio modificado', rem_activado: 'Recordatorio activado',
+  rem_confirmado: 'Recordatorio confirmado', rem_pospuesto: 'Recordatorio pospuesto', rem_estado: 'Recordatorio activado/desactivado', rem_eliminado: 'Recordatorio eliminado',
+  tarea_modificada: 'Modificación de tarea', vencimiento: 'Vencimiento', com_add: 'Comentario añadido', com_edit: 'Comentario editado', com_del: 'Comentario eliminado',
+  bind_alerta: 'Aviso BIND', sistema: 'Sistema / respaldo'
+};
+function log(type, o = {}) {
+  const e = {
+    id: uid(), ts: nowTs(), type, instId: o.inst ? o.inst.id : null, defId: o.inst ? o.inst.defId : (o.def ? o.def.id : (o.rem ? o.rem.defId || null : null)),
+    remId: o.rem ? o.rem.id : null,
+    task: o.task || (o.inst ? o.inst.name : o.def ? o.def.name : o.rem ? remTaskName(o.rem) : ''),
+    detail: o.detail || ''
+  };
+  S.hist.push(e); save('history', e); return e;
+}
+function remTaskName(r) {
+  const d = r.defId && S.defs.find(x => x.id === r.defId);
+  return d ? d.name : `Recordatorio: ${r.title}`;
+}
+
+/* ---------- 6) Interfaz base ---------- */
+function toast(msg, kind = '') {
+  const el = document.createElement('div'); el.className = 'toast ' + kind; el.textContent = msg;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 3200);
+}
+const MODALS = [];
+function openModal({title, html = '', actions = [], wide = false, dismissible = true, onClose}) {
+  const el = document.createElement('div'); el.className = 'overlay';
+  el.innerHTML = `<div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="m-head"><h3>${esc(title)}</h3>${dismissible ? `<button class="x" data-close aria-label="Cerrar">${ic('x')}</button>` : ''}</div><div class="m-body">${html}</div><div class="m-foot"></div></div>`;
+  const m = {el, body: $('.m-body', el), foot: $('.m-foot', el), closed: false, dismissible};
+  m.close = () => { if (m.closed) return; m.closed = true; el.remove(); const k = MODALS.indexOf(m); if (k >= 0) MODALS.splice(k, 1); onClose && onClose(); };
+  actions.forEach(a => {
+    const b = document.createElement('button'); b.className = 'btn ' + (a.cls || 'ghost'); b.innerHTML = a.label; if (a.id) b.id = a.id;
+    b.addEventListener('click', async ev => { const r = a.onClick ? await a.onClick(m, ev) : true; if (r !== false) m.close(); });
+    m.foot.appendChild(b);
+  });
+  el.addEventListener('mousedown', e => { if (e.target === el && dismissible) m.close(); });
+  el.addEventListener('click', e => { if (e.target.closest('[data-close]')) m.close(); });
+  $('#modalRoot').appendChild(el); MODALS.push(m);
+  const f = $('input,textarea,select', m.body); if (f) setTimeout(() => f.focus(), 30);
+  return m;
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('#alertRoot').firstChild) { e.preventDefault(); return; } // la alerta exige confirmar o posponer
+    const top = MODALS[MODALS.length - 1]; if (top && top.dismissible) top.close();
+  }
+});
+function confirmDlg(title, text, okLabel = 'Aceptar', danger = false) {
+  return new Promise(res => {
+    let v = false;
+    openModal({title, html: `<p style="margin:0">${text}</p>`, onClose: () => res(v), actions: [
+      {label: 'Cancelar', cls: 'ghost'}, {label: okLabel, cls: danger ? 'danger' : 'primary', onClick: () => { v = true; }}]});
+  });
+}
+function inputDlg(title, label, value = '') {
+  return new Promise(res => {
+    let v = null;
+    const m = openModal({title, html: `<label class="fld">${esc(label)}<input type="text" id="inDlg" value="${esc(value)}"></label>`, onClose: () => res(v), actions: [
+      {label: 'Cancelar', cls: 'ghost'},
+      {label: 'Guardar', cls: 'primary', onClick: m => { const t = $('#inDlg', m.el).value.trim(); if (!t) { $('#inDlg', m.el).focus(); return false; } v = t; }}]});
+    $('#inDlg', m.el).addEventListener('keydown', e => { if (e.key === 'Enter') $('.btn.primary', m.foot).click(); });
+  });
+}
+
+/* ---------- 7) Vistas ---------- */
+const NAV = [['daily', 'home', 'Hoy'], ['monthly', 'calendar', 'Mensual'], ['reminders', 'bell', 'Recordatorios'], ['pending', 'alert', 'Pendientes'], ['history', 'history', 'Historial'], ['settings', 'gear', 'Configuración']];
+function setView(v) { UI.view = v; UI.built = null; UI.drawer = null; UI.q = ''; UI.filter = 'all'; refresh(true); window.scrollTo && window.scrollTo(0, 0); }
+
+function renderHeader() {
+  const st = computeStats(), d = nowD();
+  $('#stPct').textContent = `${st.pct}%  (${st.done}/${st.total})`;
+  $('#stBar').style.width = st.pct + '%';
+  $('#stPend').textContent = st.pending; $('#stOver').textContent = st.overdue;
+  const nr = nextReminder(), al = S.rems.filter(r => r.alerting).length;
+  $('#stNext').textContent = al ? `${al} alerta(s) sin confirmar` : nr ? `${nr.title} · ${fmtWhen(nr.nextAt)}` : 'Sin recordatorios programados';
+  $('#clockD').textContent = d.toLocaleDateString('es-AR', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+  $$('[data-top]').forEach(b => {
+    const k = b.dataset.top;
+    b.innerHTML = k === 'newRem' ? `${ic('plus')}<span>Recordatorio</span>` : k === 'summary' ? `${ic('sun')}<span>Inicio de jornada</span>` : `${ic('focus')}<span>Modo concentración</span>`;
+    if (k === 'focus') b.classList.toggle('on', UI.focus);
+  });
+  document.body.classList.toggle('focus', UI.focus);
+  const bn = [];
+  if (!DB.ok) bn.push(`<div class="banner err">${ic('alert')}<span class="sp"><b>El almacenamiento del navegador no está disponible.</b> Los cambios solo se conservan mientras esta pestaña siga abierta. Probá abrir el archivo desde otro navegador o desde un servidor local.</span></div>`);
+  else if (!S.meta.warnDismissed) bn.push(`<div class="banner info">${ic('alert')}<span class="sp">Los datos se guardan <b>solo en este navegador</b>. Pueden perderse si borrás los datos del sitio o cambiás de equipo. Exportá un respaldo desde Configuración con regularidad.</span><button class="btn sm ghost" data-top="dismissWarn">Entendido</button></div>`);
+  $('#banners').innerHTML = bn.join('');
+}
+function renderNav() {
+  const st = computeStats(), al = S.rems.filter(r => r.alerting).length;
+  $('#nav').innerHTML = NAV.map(([k, i, l]) => {
+    let badge = '';
+    if (k === 'pending' && st.overdue) badge = `<span class="pill">${st.overdue}</span>`;
+    if (k === 'reminders' && al) badge = `<span class="pill">${al}</span>`;
+    return `<button class="tab ${UI.view === k ? 'on' : ''}" role="tab" aria-selected="${UI.view === k}" data-nav="${k}">${ic(i)}<span>${l}</span>${badge}</button>`;
+  }).join('');
+}
+function refresh(force) {
+  try {
+    renderHeader(); renderNav();
+    if (UI.view === 'settings' && !force && UI.built === 'settings') return;
+    renderMain(force);
+  } catch (e) { console.error(e); }
+}
+function renderMain(force) {
+  const main = $('#main');
+  if (UI.built !== UI.view || force) { main.innerHTML = buildView(); UI.built = UI.view; }
+  const list = $('#list'); if (list) list.innerHTML = listHTML();
+}
+function toolbarHTML(kind) {
+  const filt = kind === 'reminders'
+    ? `<select data-k="remFilter" aria-label="Filtrar recordatorios">${[['active', 'Programados'], ['alerting', 'Con alerta activa'], ['snoozed', 'Pospuestos'], ['confirmed', 'Confirmados'], ['disabled', 'Desactivados'], ['all', 'Todos']].map(([v, l]) => `<option value="${v}" ${UI.remFilter === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`
+    : `<select data-k="filter" aria-label="Filtrar por estado"><option value="all">Todos los estados</option>${['pendiente', 'en_curso', 'seguimiento', 'vencida', 'completada'].map(v => `<option value="${v}" ${UI.filter === v ? 'selected' : ''}>${STATUS[v].label}</option>`).join('')}</select>`;
+  const hide = kind === 'reminders' ? '' : `<label class="chkline"><input type="checkbox" data-k="hideDone" ${UI.hideDone ? 'checked' : ''}> Ocultar completadas</label>`;
+  return `<div class="toolbar"><input type="search" data-k="q" placeholder="Buscar tareas, recordatorios y comentarios…" value="${esc(UI.q)}" aria-label="Buscar">${filt}${hide}</div>`;
+}
+function buildView() {
+  switch (UI.view) {
+    case 'daily': return toolbarHTML('inst') + '<div id="list"></div>';
+    case 'monthly': return toolbarHTML('inst') + '<div id="list"></div>';
+    case 'pending': return toolbarHTML('inst') + '<div id="list"></div>';
+    case 'reminders': return `<div class="toolbar"><button class="btn primary" data-act="newRem">${ic('plus')} Nuevo recordatorio</button></div>` + toolbarHTML('reminders') + '<div id="list"></div>';
+    case 'history': return historyFiltersHTML() + '<div id="list"></div>';
+    case 'settings': return settingsHTML();
+  }
+  return '';
+}
+function listHTML() {
+  switch (UI.view) {
+    case 'daily': return dailyHTML();
+    case 'monthly': return monthlyHTML();
+    case 'pending': return pendingHTML();
+    case 'reminders': return remindersHTML();
+    case 'history': return historyHTML();
+  }
+  return '';
+}
+function passInst(i) {
+  if ((UI.hideDone || UI.focus) && i.status === 'completada') return false;
+  if (UI.filter !== 'all' && effStatus(i).key !== UI.filter) return false;
+  if (UI.q) {
+    const hay = norm(i.name + ' ' + i.slot + ' ' + commentsOf('instance', i.id).map(c => c.text).join(' '));
+    if (!hay.includes(norm(UI.q))) return false;
+  }
+  return true;
+}
+function rowHTML(i, compact) {
+  const st = effStatus(i), nC = commentsOf('instance', i.id), nR = remsFor(i).length, done = i.status === 'completada';
+  const badges = [];
+  badges.push(`<span class="b ${st.cls}">${st.label}</span>`);
+  if (st.key === 'vencida' && i.status === 'seguimiento') badges.push('<span class="b orange">Seguimiento</span>');
+  if (st.key !== 'completada' && isLate(i)) badges.push(`<span class="b red">Atrasada · ${i.type === 'daily' ? fmtDay(i.period) : monthLabel(i.period)}</span>`);
+  if (i.due) {
+    const dd = Math.round((parseYmd(i.due) - parseYmd(ymd(nowD()))) / 86400000);
+    const c = done ? '' : (dd < 0 ? 'red' : dd <= 3 ? 'orange' : 'blue');
+    badges.push(`<span class="b ${c}">${ic('calendar')} Vence ${fmtDay(i.due)}${!done && dd >= 0 && dd <= 3 ? (dd === 0 ? ' (hoy)' : ` (en ${dd} d)`) : ''}</span>`);
+  }
+  if (done && i.completedAt) badges.push(`<span class="b green">${ic('clock')} ${fmtDT(i.completedAt)}</span>`);
+  const last = nC[0] ? `<div class="t-last">${ic('chat')} ${esc(snippet(nC[0].text, 110))}</div>` : '';
+  const label = compact && i.slot ? `Revisión ${i.slot}` : instTitle(i);
+  const open = UI.drawer === i.id;
+  const drawer = open ? `<div class="drawer" data-id="${esc(i.id)}"><div class="dh"><span>Cambiar estado</span><button class="ibtn" data-act="drawer" aria-label="Cerrar cajón">${ic('x')}</button></div>
+    <div class="opts">${['pendiente', 'en_curso', 'seguimiento', 'completada'].map(s => `<button class="opt-st s-${s} ${i.status === s ? 'cur' : ''}" data-act="setStatus" data-st="${s}" ${i.status === s ? 'aria-current="true"' : ''}><i></i>${STATUS[s].label}${i.status === s ? ' ✓' : ''}</button>`).join('')}</div>
+    <div class="hint">“Vencida” se aplica automáticamente al pasar la fecha de vencimiento o el período. Al elegir un estado se guarda al instante y se muestra un mensaje de confirmación.</div></div>` : '';
+  return `<div class="task s-${st.key} ${done ? 'done' : ''} ${isFuture(i) ? 'future' : ''}" data-id="${esc(i.id)}">
+    <button class="chk" role="checkbox" aria-checked="${done}" aria-expanded="${open}" aria-label="Cambiar estado: ${esc(label)}" data-act="drawer">${done ? ic('check') : ''}</button>
+    <div style="min-width:0"><div class="t-name">${esc(label)}</div><div class="t-meta">${badges.join('')}</div>${last}</div>
+    <div class="t-act">
+      <button class="ibtn ${open ? 'on' : ''}" data-act="drawer" title="Cambiar estado" aria-expanded="${open}">${ic(open ? 'up' : 'down')}<span class="lbl">Estado</span></button>
+      <button class="ibtn ${nC.length ? 'on' : ''}" data-act="comments" title="Comentarios">${ic('chat')}<span class="lbl">Comentarios</span> ${nC.length}</button>
+      <button class="ibtn ${nR ? 'on' : ''}" data-act="taskRems" title="Recordatorios asociados">${ic('bell')}<span class="lbl">Recordatorios</span> ${nR}</button>
+      <button class="ibtn" data-act="detail" title="Detalles">${ic('edit')}<span class="lbl">Detalles</span></button>
+    </div></div>${drawer}`;
+}
+function dailyHTML() {
+  const today = ymd(nowD()), st = computeStats();
+  const all = S.inst.filter(i => visible(i) && i.type === 'daily' && i.period === today).sort(cmpInst);
+  let html = '';
+  if (st.late > 0) html += `<div class="banner warn">${ic('alert')}<span class="sp"><b>${st.late}</b> tarea(s) pendiente(s) de períodos anteriores siguen abiertas.</span><button class="btn sm ghost" data-nav="pending">Ver pendientes</button></div>`;
+  const slotsPast = all.filter(i => i.slot && i.status !== 'completada' && !isFuture(i));
+  if (slotsPast.length >= 2) html += `<div class="banner warn">${ic('clock')}<span class="sp"><b>Revisiones del BIND pendientes (${slotsPast.length}):</b> ${slotsPast.map(i => i.slot).join(', ')}. Cada una se completa por separado.</span></div>`;
+  if (!all.length) return html + `<div class="card"><div class="empty">Hoy no hay tareas programadas.</div></div>`;
+  const blocks = [];
+  all.filter(passInst).forEach(i => {
+    const k = i.slot ? 'bind' : 'rows', last = blocks[blocks.length - 1];
+    if (last && last.k === k) last.items.push(i); else blocks.push({k, items: [i]});
+  });
+  if (!blocks.length) return html + `<div class="card"><div class="empty">Ninguna tarea coincide con los filtros actuales.</div></div>`;
+  const b = cfg().bind;
+  blocks.forEach(bl => {
+    if (bl.k === 'rows') html += `<div class="card">${bl.items.map(i => rowHTML(i)).join('')}</div>`;
+    else html += `<div class="card"><div class="ch"><h3>${esc(bl.items[0].name)}</h3><span class="muted small">${b.start}–${b.end} · cada ${b.interval} min</span></div>${bl.items.map(i => rowHTML(i, true)).join('')}</div>`;
+  });
+  return html;
+}
+function monthlyHTML() {
+  const cur = ymOf(nowD());
+  const all = S.inst.filter(i => visible(i) && i.type === 'monthly');
+  const periods = [...new Set(all.map(i => i.period).concat([cur]))].sort().reverse();
+  const late = all.filter(i => i.status !== 'completada' && i.period < cur).length;
+  let html = late ? `<div class="banner warn">${ic('alert')}<span class="sp"><b>${late}</b> tarea(s) mensual(es) de períodos anteriores siguen pendientes.</span></div>` : '';
+  html += `<div class="muted small" style="margin:0 0 10px">Las tareas mensuales se generan automáticamente al comenzar cada mes. Los vencimientos solo se asignan si los configurás en Configuración o en los detalles de cada tarea.</div>`;
+  let any = false;
+  periods.forEach(p => {
+    const items = all.filter(i => i.period === p).sort(cmpInst), shown = items.filter(passInst);
+    if (!items.length) return;
+    const done = items.filter(i => i.status === 'completada').length, pend = items.length - done;
+    if (!shown.length && (UI.q || UI.filter !== 'all' || UI.hideDone || UI.focus)) return;
+    any = true;
+    const head = `${esc(monthLabel(p))}${p === cur ? ' <span class="b navy">Mes actual</span>' : ''}`;
+    const sum = `<span class="muted small">${done}/${items.length} completadas${pend && p < cur ? ` · <b style="color:var(--red)">${pend} atrasadas</b>` : ''}</span>`;
+    if (p === cur) html += `<div class="card"><div class="ch"><h3>${head}</h3>${sum}</div>${shown.map(i => rowHTML(i)).join('') || '<div class="empty">Sin tareas para mostrar.</div>'}</div>`;
+    else html += `<details class="month" ${pend ? 'open' : ''}><summary><span>${head}</span>${sum}</summary><div class="card">${shown.map(i => rowHTML(i)).join('') || '<div class="empty">Sin tareas para mostrar.</div>'}</div></details>`;
+  });
+  return html + (any ? '' : '<div class="card"><div class="empty">No hay tareas mensuales para mostrar.</div></div>');
+}
+function pendingHTML() {
+  const items = S.inst.filter(i => visible(i) && i.status !== 'completada' && countable(i)).filter(passInst).sort((a, b) => a.period.localeCompare(b.period) || cmpInst(a, b));
+  const groups = [
+    ['Vencidas y atrasadas', items.filter(isOverdue)],
+    ['Requieren seguimiento', items.filter(i => !isOverdue(i) && i.status === 'seguimiento')],
+    ['Pendientes del período actual', items.filter(i => !isOverdue(i) && i.status !== 'seguimiento')]
+  ];
+  const html = groups.filter(g => g[1].length).map(([t, arr]) => `<div class="card"><div class="ch"><h3>${t}</h3><span class="b">${arr.length}</span></div>${arr.map(i => rowHTML(i)).join('')}</div>`).join('');
+  return html || `<div class="card"><div class="empty">${ic('check')}<br>No hay tareas pendientes ni vencidas.</div></div>`;
+}
+function remindersHTML() {
+  let arr = S.rems.slice();
+  const f = UI.remFilter;
+  arr = arr.filter(r => f === 'all' ? true : f === 'alerting' ? r.alerting : f === 'active' ? (r.state === 'active' || r.state === 'snoozed') && !r.alerting : f === 'snoozed' ? r.state === 'snoozed' && !r.alerting : r.state === f);
+  if (UI.q) arr = arr.filter(r => norm(r.title + ' ' + r.desc + ' ' + remTaskName(r) + ' ' + commentsOf('reminder', r.id).map(c => c.text).join(' ')).includes(norm(UI.q)));
+  arr.sort((a, b) => (b.alerting - a.alerting) || a.nextAt - b.nextAt);
+  if (!arr.length) return `<div class="card"><div class="empty">No hay recordatorios para este filtro.</div></div>`;
+  return `<div class="card">${arr.map(remItemHTML).join('')}</div>`;
+}
+const repeatText = r => ({none: 'Una sola vez', daily: 'Diariamente', weekly: 'Semanalmente', monthly: 'Mensualmente', custom: `Cada ${r.every} ${({min: 'min', hour: 'h', day: 'día(s)', week: 'semana(s)', month: 'mes(es)'})[r.unit]}`})[r.type];
+function remItemHTML(r) {
+  const nC = commentsOf('reminder', r.id).length, off = r.state === 'disabled' || r.state === 'confirmed';
+  const stb = r.alerting ? '<span class="b red">Alerta activa</span>' : r.state === 'snoozed' ? `<span class="b orange">Pospuesto hasta ${fmtWhen(r.nextAt)}</span>` : r.state === 'confirmed' ? '<span class="b green">Confirmado</span>' : r.state === 'disabled' ? '<span class="b">Desactivado</span>' : `<span class="b blue">Programado ${fmtWhen(r.nextAt)}</span>`;
+  const task = r.defId ? `<span class="b">${ic('list')} ${esc(remTaskName(r))}</span>` : '<span class="b">Independiente</span>';
+  return `<div class="rem p-${r.priority} ${r.alerting ? 'alerting' : ''} ${off ? 'off' : ''}" data-rid="${esc(r.id)}">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><h4>${esc(r.title)}</h4><div class="t-meta" style="margin:0">${stb}<span class="b ${r.priority === 'alta' ? 'red' : r.priority === 'media' ? 'blue' : ''}">Prioridad ${r.priority}</span></div></div>
+    ${r.desc ? `<div class="muted" style="margin-top:4px;white-space:pre-wrap">${esc(snippet(r.desc, 220))}</div>` : ''}
+    <div class="t-meta" style="margin-top:6px">${task}<span class="b">${ic('clock')} ${fmtDT(r.baseAt)}</span><span class="b">${repeatText(r.repeat)}</span></div>
+    <div class="act">
+      <button class="btn sm" data-ra="confirm">${ic('check')} Confirmar</button>
+      <button class="ibtn" data-ra="snooze">${ic('clock')} Posponer</button>
+      <button class="ibtn" data-ra="comments">${ic('chat')} Comentarios ${nC}</button>
+      <button class="ibtn" data-ra="edit">${ic('edit')} Editar</button>
+      <button class="ibtn" data-ra="toggle">${r.state === 'disabled' ? 'Activar' : 'Desactivar'}</button>
+      <button class="ibtn" data-ra="del">${ic('trash')} Eliminar</button>
+    </div></div>`;
+}
+/* Historial */
+function historyFiltersHTML() {
+  const h = UI.hist, tasks = [...new Set(S.hist.map(e => e.task).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+  return `<div class="toolbar">
+    <label class="chkline">Día <input type="date" class="inp" data-h="day" value="${h.day}"></label>
+    <label class="chkline">Mes <input type="month" class="inp" data-h="month" value="${h.month}"></label>
+    <select data-h="task" aria-label="Tarea"><option value="">Todas las tareas</option>${tasks.map(t => `<option ${h.task === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+    <select data-h="type" aria-label="Tipo de evento"><option value="">Todos los eventos</option>${Object.entries(HTYPES).map(([k, v]) => `<option value="${k}" ${h.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    <input type="search" data-h="q" placeholder="Buscar en el detalle…" value="${esc(h.q)}">
+    <button class="btn ghost sm" data-act="histClear">Limpiar</button></div>`;
+}
+function historyHTML() {
+  const h = UI.hist;
+  let arr = S.hist.filter(e => {
+    if (h.day && ymd(new Date(e.ts)) !== h.day) return false;
+    if (h.month && ymOf(new Date(e.ts)) !== h.month) return false;
+    if (h.task && e.task !== h.task) return false;
+    if (h.type && e.type !== h.type) return false;
+    if (h.q && !norm(e.task + ' ' + e.detail).includes(norm(h.q))) return false;
+    return true;
+  }).sort((a, b) => b.ts - a.ts);
+  const total = arr.length; arr = arr.slice(0, h.limit);
+  if (!arr.length) return `<div class="card"><div class="empty">No hay actividad registrada para estos filtros.</div></div>`;
+  const colors = {completada: 'green', reabierta: 'orange', rem_activado: 'red', rem_pospuesto: 'orange', rem_confirmado: 'green', bind_alerta: 'orange'};
+  return `<div class="card"><div class="ch"><h3>Registro de actividad local</h3><span class="muted small">${total} evento(s). No es una auditoría inalterable.</span></div>${arr.map(e => `<div class="hist"><div class="when">${fmtDT(e.ts)}</div><div><span class="b ${colors[e.type] || 'blue'}">${HTYPES[e.type] || e.type}</span> <b>${esc(e.task)}</b>${e.detail ? `<div class="muted">${esc(e.detail)}</div>` : ''}</div></div>`).join('')}</div>${total > arr.length ? `<button class="btn ghost" data-act="histMore">Mostrar más</button>` : ''}`;
+}
+
+/* Detalle de tarea */
+function openDetail(id) {
+  const i = S.inst.find(x => x.id === id); if (!i) return;
+  const st = effStatus(i), hist = S.hist.filter(e => e.instId === i.id).sort((a, b) => b.ts - a.ts).slice(0, 8);
+  const rems = remsFor(i);
+  const m = openModal({title: 'Detalles de la tarea', wide: true, actions: [{label: 'Cerrar', cls: 'ghost'}], html: `
+    <h3 style="color:var(--navy);margin-bottom:6px">${esc(instTitle(i))}</h3>
+    <div class="t-meta" style="margin-bottom:12px"><span class="b ${st.cls}">${st.label}</span><span class="b">${i.type === 'daily' ? 'Diaria · ' + fmtDay(i.period) : 'Mensual · ' + esc(monthLabel(i.period))}</span>${i.completedAt ? `<span class="b green">Finalizada ${fmtDT(i.completedAt)}</span>` : ''}</div>
+    <div class="grid2">
+      <label class="fld">Estado<select id="dStatus">${['pendiente', 'en_curso', 'seguimiento', 'completada'].map(s => `<option value="${s}" ${i.status === s ? 'selected' : ''}>${STATUS[s].label}</option>`).join('')}</select></label>
+      ${i.type === 'monthly' ? `<label class="fld">Vencimiento (opcional)<input type="date" id="dDue" value="${i.due || ''}"></label>` : ''}
+    </div>
+    <div class="note" style="margin-bottom:12px">“Vencida” se aplica automáticamente cuando pasa la fecha de vencimiento o el período. Cada cambio de estado se guarda al instante y muestra un mensaje de confirmación.</div>
+    <div class="t-act" style="justify-content:flex-start;margin-bottom:14px">
+      <button class="btn" data-d="comments">${ic('chat')} Comentarios (${commentsOf('instance', i.id).length})</button>
+      <button class="btn ghost" data-d="newRem">${ic('bell')} Nuevo recordatorio</button>
+    </div>
+    <h4 style="color:var(--navy)">Recordatorios asociados</h4>
+    ${rems.length ? rems.map(r => `<div class="hist" style="padding:6px 0"><div class="when">${fmtWhen(r.nextAt)}</div><div>${esc(r.title)} <button class="ibtn" data-d="editRem" data-rid="${esc(r.id)}">${ic('edit')}</button></div></div>`).join('') : '<div class="muted small" style="margin:4px 0 12px">Sin recordatorios asociados.</div>'}
+    <h4 style="color:var(--navy);margin-top:10px">Actividad reciente</h4>
+    ${hist.length ? hist.map(e => `<div class="hist" style="padding:6px 0"><div class="when">${fmtDT(e.ts)}</div><div>${HTYPES[e.type] || e.type}${e.detail ? ' · ' + esc(snippet(e.detail, 90)) : ''}</div></div>`).join('') : '<div class="muted small">Sin actividad.</div>'}`});
+  m.body.addEventListener('change', async e => {
+    if (e.target.id === 'dStatus') { setStatus(i, e.target.value); m.close(); }
+    if (e.target.id === 'dDue') setDue(i, e.target.value || null);
+  });
+  m.body.addEventListener('click', e => {
+    const b = e.target.closest('[data-d]'); if (!b) return;
+    if (b.dataset.d === 'comments') openComments('instance', i.id);
+    if (b.dataset.d === 'newRem') openReminderForm({defId: i.defId, instId: i.id, title: i.slot ? `${i.name} (${i.slot})` : i.name});
+    if (b.dataset.d === 'editRem') { const r = S.rems.find(x => x.id === b.dataset.rid); r && openReminderForm({edit: r}); }
+  });
+}
+function setDue(i, due) {
+  if ((i.due || null) === (due || null)) return;
+  const old = i.due; i.due = due || null; i.dueManual = true; save('instances', i);
+  log('vencimiento', {inst: i, detail: `${old ? fmtDay(old) : 'sin fecha'} → ${due ? fmtDay(due) : 'sin fecha'}`});
+  refresh(); toast('Vencimiento actualizado', 'ok');
+}
+function openTaskRems(id) {
+  const i = S.inst.find(x => x.id === id); if (!i) return;
+  const rems = remsFor(i);
+  const m = openModal({title: 'Recordatorios · ' + instTitle(i), actions: [{label: 'Cerrar', cls: 'ghost'}, {label: `${ic('plus')} Nuevo`, cls: 'primary', onClick: () => { openReminderForm({defId: i.defId, instId: i.id, title: i.name}); }}],
+    html: rems.length ? rems.map(r => `<div class="hist" style="padding:8px 0"><div class="when">${fmtWhen(r.nextAt)}</div><div><b>${esc(r.title)}</b> <span class="b ${r.priority === 'alta' ? 'red' : ''}">${r.priority}</span><br><button class="ibtn" data-rid="${esc(r.id)}">${ic('edit')} Editar</button></div></div>`).join('') : '<div class="muted">Esta tarea no tiene recordatorios activos.</div>'});
+  m.body.addEventListener('click', e => { const b = e.target.closest('[data-rid]'); if (b) { const r = S.rems.find(x => x.id === b.dataset.rid); r && openReminderForm({edit: r}); } });
+}
+
+/* ---------- 8) Comentarios ---------- */
+function saveDraft(key, text) {
+  const d = Object.assign({}, S.meta.drafts || {});
+  if (text) d[key] = text; else delete d[key];
+  setMeta('drafts', d);
+}
+function addComment(kind, pid, text, title) {
+  text = (text || '').trim(); if (!text) return null;
+  const c = {id: uid(), parentKind: kind, parentId: pid, text, createdAt: nowTs(), updatedAt: nowTs()};
+  S.comments.push(c); save('comments', c);
+  const inst = kind === 'instance' ? S.inst.find(i => i.id === pid) : null, rem = kind === 'reminder' ? S.rems.find(r => r.id === pid) : null;
+  log('com_add', {inst, rem, detail: snippet(text, 160)});
+  saveDraft(`${kind}:${pid}`, ''); refresh(); return c;
+}
+function updateComment(c, text, inst, rem) {
+  text = text.trim(); if (!text || text === c.text) return;
+  c.text = text; c.updatedAt = nowTs(); save('comments', c);
+  const last = S.hist[S.hist.length - 1];
+  if (last && last.type === 'com_edit' && last.cid === c.id && nowTs() - last.ts < 120000) { last.ts = nowTs(); last.detail = snippet(text, 160); save('history', last); }
+  else { const e = log('com_edit', {inst, rem, detail: snippet(text, 160)}); e.cid = c.id; save('history', e); }
+}
+function openComments(kind, id) {
+  const parent = kind === 'instance' ? S.inst.find(i => i.id === id) : S.rems.find(r => r.id === id); if (!parent) return;
+  const inst = kind === 'instance' ? parent : null, rem = kind === 'reminder' ? parent : null;
+  const key = `${kind}:${id}`, editing = new Set();
+  const m = openModal({title: 'Comentarios · ' + (inst ? instTitle(inst) : rem.title), wide: true, actions: [{label: 'Cerrar', cls: 'ghost'}], html: `
+    <div class="cm-new"><textarea id="cmNew" rows="3" placeholder="Observaciones, aclaraciones, problemas detectados o información pendiente…" aria-label="Nuevo comentario"></textarea>
+    <div class="row"><span class="muted small" id="cmDraft">Se guarda un borrador automáticamente.</span><button class="btn primary" data-c="add">${ic('plus')} Añadir comentario</button></div></div><div id="cmList"></div>`});
+  const ta = $('#cmNew', m.el);
+  ta.value = (S.meta.drafts || {})[key] || '';
+  ta.addEventListener('input', debounce(() => { saveDraft(key, ta.value); $('#cmDraft', m.el).textContent = 'Borrador guardado'; }, 500));
+  const list = $('#cmList', m.el);
+  const render = () => {
+    const cs = commentsOf(kind, id);
+    list.innerHTML = cs.length ? cs.map(c => `<div class="cm" data-cid="${esc(c.id)}"><div class="h"><span>${fmtDT(c.createdAt)}${c.updatedAt > c.createdAt ? ` · editado ${fmtDT(c.updatedAt)}` : ''}</span><span class="cm-st"></span></div>
+      ${editing.has(c.id) ? `<textarea rows="3" class="cm-edit" style="width:100%;margin:6px 0;border:1px solid var(--gray);border-radius:10px;padding:8px">${esc(c.text)}</textarea><div class="a"><button class="ibtn on" data-c="done">${ic('check')} Listo</button></div>`
+        : `<div class="tx">${esc(c.text)}</div><div class="a"><button class="ibtn" data-c="edit">${ic('edit')} Editar</button><button class="ibtn" data-c="del">${ic('trash')} Eliminar</button><button class="ibtn" data-c="rem">${ic('bell')} Crear recordatorio</button></div>`}</div>`).join('') : '<div class="empty">Todavía no hay comentarios.</div>';
+  };
+  render();
+  m.body.addEventListener('input', debounce(e => {
+    if (!e.target.classList.contains('cm-edit')) return;
+    const box = e.target.closest('.cm'), c = S.comments.find(x => x.id === box.dataset.cid);
+    updateComment(c, e.target.value, inst, rem); const st = $('.cm-st', box); if (st) st.textContent = 'Guardado'; refresh();
+  }, 600));
+  m.body.addEventListener('click', async e => {
+    const b = e.target.closest('[data-c]'); if (!b) return;
+    const box = b.closest('.cm'), c = box && S.comments.find(x => x.id === box.dataset.cid);
+    switch (b.dataset.c) {
+      case 'add': { if (addComment(kind, id, ta.value)) { ta.value = ''; render(); toast('Comentario añadido', 'ok'); } break; }
+      case 'edit': editing.add(c.id); render(); { const t = $('.cm-edit', list.querySelector(`[data-cid="${c.id}"]`)); t && t.focus(); } break;
+      case 'done': { const t = $('.cm-edit', box); updateComment(c, t.value, inst, rem); editing.delete(c.id); render(); refresh(); break; }
+      case 'del': {
+        if (await confirmDlg('Eliminar comentario', '¿Eliminar este comentario? Quedará constancia de la eliminación en el historial.', 'Eliminar', true)) {
+          S.comments.splice(S.comments.indexOf(c), 1); remove('comments', c.id);
+          log('com_del', {inst, rem, detail: snippet(c.text, 160)}); render(); refresh();
+        } break; }
+      case 'rem': openReminderForm({defId: inst ? inst.defId : rem.defId, instId: inst ? inst.id : rem.instId, title: snippet(c.text, 70), desc: c.text}); break;
+    }
+  });
+}
+
+/* ---------- 9) Recordatorios y alertas ---------- */
+function stepTs(base, unit, every, n, anchor) {
+  const d = new Date(base);
+  if (unit === 'month') {
+    const t = d.getMonth() + every * n, y = d.getFullYear() + Math.floor(t / 12), mo = ((t % 12) + 12) % 12;
+    return new Date(y, mo, Math.min(anchor || d.getDate(), daysIn(y, mo)), d.getHours(), d.getMinutes()).getTime();
+  }
+  d.setDate(d.getDate() + every * n); return d.getTime();
+}
+/* Primera ocurrencia estrictamente posterior a max(ahora, baseAt). */
+function nextOccurrence(r) {
+  const rp = r.repeat; if (rp.type === 'none') return null;
+  let unit, every;
+  if (rp.type === 'daily') { unit = 'day'; every = 1; } else if (rp.type === 'weekly') { unit = 'day'; every = 7; }
+  else if (rp.type === 'monthly') { unit = 'month'; every = 1; }
+  else { unit = rp.unit; every = Math.max(1, rp.every | 0); if (unit === 'week') { unit = 'day'; every *= 7; } }
+  const target = Math.max(nowTs(), r.baseAt);
+  if (unit === 'min' || unit === 'hour') { const step = every * (unit === 'min' ? 60000 : 3600000); return r.baseAt + (Math.floor((target - r.baseAt) / step) + 1) * step; }
+  let n = 1, c = stepTs(r.baseAt, unit, every, n, r.anchorDay);
+  while (c <= target && n < 20000) { n++; c = stepTs(r.baseAt, unit, every, n, r.anchorDay); }
+  return c;
+}
+function fireReminder(r) {
+  r.alerting = true; r.lastFiredAt = nowTs(); save('reminders', r);
+  log('rem_activado', {rem: r, detail: `Programado para ${fmtDT(r.baseAt)}`});
+  beep(); sysNotify(r.title, r.desc || 'Recordatorio programado');
+}
+function checkReminders() {
+  let fired = false;
+  S.rems.forEach(r => { if ((r.state === 'active' || r.state === 'snoozed') && !r.alerting && r.nextAt <= nowTs()) { fireReminder(r); fired = true; } });
+  return fired;
+}
+function confirmReminder(r) {
+  r.alerting = false; r.lastConfirmedAt = nowTs();
+  if (r.repeat.type === 'none') r.state = 'confirmed';
+  else { r.baseAt = nextOccurrence(r); r.nextAt = r.baseAt; r.state = 'active'; }
+  save('reminders', r);
+  log('rem_confirmado', {rem: r, detail: r.state === 'active' ? `Próxima activación: ${fmtDT(r.nextAt)}` : 'No se repite'});
+  refresh(); renderAlerts();
+}
+function snoozeReminder(r, min) {
+  min = Math.round(Number(min));
+  if (!(min >= 1 && min <= 10080)) { toast('Ingresá un intervalo entre 1 y 10080 minutos', 'err'); return false; }
+  r.alerting = false; r.state = 'snoozed'; r.nextAt = nowTs() + min * 60000; save('reminders', r);
+  log('rem_pospuesto', {rem: r, detail: `Pospuesto ${min} min · vuelve a las ${fmtTime(r.nextAt)}`});
+  refresh(); renderAlerts(); return true;
+}
+function checkBind() {
+  const today = ymd(nowD());
+  if (RT.bindRemindAt && nowTs() >= RT.bindRemindAt) { RT.bindRemindAt = 0; if (bindPending().length) RT.bindAlert = true; }
+  const fresh = S.inst.filter(i => i.slot && visible(i) && i.period === today && i.status !== 'completada' && !i.alerted && slotTs(i) <= nowTs());
+  if (!fresh.length) return;
+  fresh.forEach(i => { i.alerted = true; });
+  saveMany('instances', fresh);
+  log('bind_alerta', {def: defOf(fresh[0]), detail: `Revisiones vencidas: ${fresh.map(i => i.slot).join(', ')}`});
+  if (cfg().bind.pending === 'grouped') { RT.bindAlert = true; beep(); sysNotify('Revisión del BIND', 'Hay revisiones pendientes'); }
+}
+const bindPending = () => S.inst.filter(i => i.slot && visible(i) && i.period === ymd(nowD()) && i.status !== 'completada' && slotTs(i) <= nowTs());
+function alertQueue() {
+  const q = S.rems.filter(r => r.alerting && r.state !== 'disabled').sort((a, b) => PRI[b.priority] - PRI[a.priority] || a.nextAt - b.nextAt).map(r => ({kind: 'rem', r}));
+  if (RT.bindAlert && bindPending().length) q.push({kind: 'bind'}); else RT.bindAlert = null;
+  return q;
+}
+function renderAlerts() {
+  const root = $('#alertRoot'), q = alertQueue();
+  if (!q.length) { root.innerHTML = ''; RT.alertKey = ''; document.title = 'Checklist administrativo'; return; }
+  document.title = `(${q.length}) ⏰ Alerta pendiente`;
+  if (nowTs() < RT.suppressUntil) {
+    const key = 'sup' + q.length;
+    if (RT.alertKey !== key) { root.innerHTML = `<div class="alert-chip"><button class="btn danger" data-alert="show">${ic('bell')} ${q.length} alerta(s) ocultas · Mostrar</button></div>`; RT.alertKey = key; }
+    return;
+  }
+  const it = q[0], key = it.kind === 'rem' ? `${it.r.id}|${it.r.lastFiredAt}|${q.length}` : `bind|${bindPending().length}|${q.length}`;
+  if (RT.alertKey === key && root.firstChild) return;
+  RT.alertKey = key;
+  const snz = cfg().snooze, counter = q.length > 1 ? `<span class="b navy">Alerta 1 de ${q.length}</span>` : '';
+  const snoozeBtns = snz.map(m => `<button class="btn ghost" data-alert="snooze" data-min="${m}">Posponer ${m} min</button>`).join('');
+  const custom = `<span style="display:inline-flex;gap:6px;align-items:center"><input type="number" min="1" max="10080" id="alCustom" class="inp" style="width:90px" value="${it.kind === 'rem' ? it.r.snoozeMin || cfg().snoozeCustom : cfg().snoozeCustom}" aria-label="Minutos personalizados"><button class="btn ghost" data-alert="snoozeCustom">Posponer (min)</button></span>`;
+  const esc2 = `<div class="esc muted">¿Algo falló y no podés continuar? <button data-alert="hide">Ocultar las alertas 10 minutos</button> (no se confirman ni se pierden).</div>`;
+  if (it.kind === 'rem') {
+    const r = it.r, def = r.defId && S.defs.find(d => d.id === r.defId);
+    root.innerHTML = `<div class="alert-ov" role="alertdialog" aria-modal="true" aria-label="Recordatorio"><div class="alert p-${r.priority}">
+      <div class="a-head"><span class="b ${r.priority === 'alta' ? 'red' : r.priority === 'media' ? 'blue' : ''}" style="font-size:14px">${ic('bell')} Prioridad ${r.priority}</span>${counter}</div>
+      <h2>${esc(r.title)}</h2>
+      <div class="a-desc">${r.desc ? esc(r.desc) : '<span class="muted">Sin descripción.</span>'}</div>
+      <div class="a-when"><span class="b" style="font-size:14px">${ic('clock')} Programado: ${fmtDT(r.baseAt)}</span>${def ? `<span class="b" style="font-size:14px">${ic('list')} ${esc(def.name)}</span>` : ''}</div>
+      <div class="a-foot"><div class="a-btns"><button class="btn ok big" data-alert="confirm">${ic('check')} Confirmar y cerrar</button>${snoozeBtns}${custom}</div>
+      <div class="muted small" style="margin-top:8px">Confirmar significa que viste la alerta; no completa ninguna tarea asociada.</div>${esc2}</div></div></div>`;
+  } else {
+    const pend = bindPending();
+    root.innerHTML = `<div class="alert-ov" role="alertdialog" aria-modal="true" aria-label="Revisión del BIND"><div class="alert bind">
+      <div class="a-head"><span class="b orange" style="font-size:14px">${ic('clock')} Revisión del BIND</span>${counter}</div>
+      <h2>${pend.length === 1 ? 'Hay 1 revisión pendiente' : `Hay ${pend.length} revisiones pendientes`}</h2>
+      <div class="a-desc">Horarios sin completar: <b>${pend.map(i => i.slot).join(', ')}</b>.<br>Cada revisión se marca por separado desde la lista de hoy. Esta alerta no completa ninguna.</div>
+      <div class="a-foot"><div class="a-btns"><button class="btn primary big" data-alert="bindClose">Entendido, cerrar aviso</button>${snz.map(m => `<button class="btn ghost" data-alert="bindSnooze" data-min="${m}">Recordar en ${m} min</button>`).join('')}</div>${esc2}</div></div></div>`;
+  }
+}
+$('#alertRoot').addEventListener('click', e => {
+  const b = e.target.closest('[data-alert]'); if (!b) return;
+  const q = alertQueue(), it = q[0], a = b.dataset.alert;
+  if (a === 'show') { RT.suppressUntil = 0; RT.alertKey = ''; renderAlerts(); return; }
+  if (a === 'hide') { RT.suppressUntil = nowTs() + 600000; RT.alertKey = ''; renderAlerts(); return; }
+  if (!it) return;
+  if (it.kind === 'rem') {
+    if (a === 'confirm') confirmReminder(it.r);
+    if (a === 'snooze') snoozeReminder(it.r, b.dataset.min);
+    if (a === 'snoozeCustom') { const v = $('#alCustom').value; if (snoozeReminder(it.r, v)) { it.r.snoozeMin = Math.round(Number(v)); save('reminders', it.r); } }
+  } else {
+    if (a === 'bindClose') { RT.bindAlert = null; renderAlerts(); }
+    if (a === 'bindSnooze') { RT.bindAlert = null; RT.bindRemindAt = nowTs() + Number(b.dataset.min) * 60000; renderAlerts(); }
+  }
+});
+let audioCtx = null;
+function beep() {
+  if (!cfg().sound) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    audioCtx = audioCtx || new AC(); const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination); o.frequency.value = 880; g.gain.value = 0.08;
+    o.start(); o.stop(audioCtx.currentTime + 0.35);
+  } catch (e) {}
+}
+function sysNotify(title, body) {
+  try {
+    if (cfg().sysNotif && typeof Notification !== 'undefined' && Notification.permission === 'granted')
+      new Notification(title, {body, tag: 'chk-' + title, requireInteraction: true});
+  } catch (e) {}
+}
+/* Formulario de recordatorio */
+function openReminderForm(o = {}) {
+  const ed = o.edit, d = nowD();
+  let date, time;
+  if (ed) { const x = new Date(ed.baseAt); date = ymd(x); time = fmtTime(ed.baseAt); }
+  else { const x = new Date(d.getTime() + 3600000); x.setMinutes(0, 0, 0); date = ymd(x); time = fmtTime(x.getTime()); }
+  const rp = ed ? ed.repeat : {type: 'none', every: 1, unit: 'day'};
+  const defs = S.defs.filter(x => !x.archived || (ed && ed.defId === x.id));
+  const defId = ed ? ed.defId : o.defId || '';
+  const m = openModal({title: ed ? 'Editar recordatorio' : 'Nuevo recordatorio', wide: true, html: `
+    <label class="fld">Título *<input type="text" id="rTitle" maxlength="140" value="${esc(ed ? ed.title : o.title || '')}"></label>
+    <label class="fld">Descripción (opcional)<textarea id="rDesc" rows="3">${esc(ed ? ed.desc : o.desc || '')}</textarea></label>
+    <div class="grid2">
+      <label class="fld">Fecha *<input type="date" id="rDate" value="${date}"></label>
+      <label class="fld">Hora *<input type="time" id="rTime" value="${time}"></label>
+      <label class="fld">Prioridad<select id="rPri">${['baja', 'media', 'alta'].map(p => `<option ${(ed ? ed.priority : 'media') === p ? 'selected' : ''}>${p}</option>`).join('')}</select></label>
+      <label class="fld">Repetición<select id="rRep">${[['none', 'Una sola vez'], ['daily', 'Diariamente'], ['weekly', 'Semanalmente'], ['monthly', 'Mensualmente'], ['custom', 'Intervalo personalizado']].map(([v, l]) => `<option value="${v}" ${rp.type === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    <div class="grid2" id="rCustom" ${rp.type === 'custom' ? '' : 'hidden'}>
+      <label class="fld">Repetir cada<input type="number" min="1" max="999" id="rEvery" value="${rp.every || 1}"></label>
+      <label class="fld">Unidad<select id="rUnit">${[['min', 'minutos'], ['hour', 'horas'], ['day', 'días'], ['week', 'semanas'], ['month', 'meses']].map(([v, l]) => `<option value="${v}" ${rp.unit === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    <div class="grid2">
+      <label class="fld">Tarea asociada (opcional)<select id="rTask"><option value="">— Independiente del checklist —</option>${defs.map(x => `<option value="${x.id}" ${defId === x.id ? 'selected' : ''}>${x.type === 'daily' ? 'Diaria' : 'Mensual'}: ${esc(x.name)}</option>`).join('')}</select></label>
+      <label class="fld">Posponer personalizado (min)<input type="number" min="1" max="10080" id="rSnooze" value="${ed ? ed.snoozeMin || cfg().snoozeCustom : cfg().snoozeCustom}"></label>
+    </div>
+    <div class="err" id="rErr" hidden></div>`,
+    actions: [{label: 'Cancelar', cls: 'ghost'}, {label: 'Guardar', cls: 'primary', onClick: async m => {
+      const g = id => $(id, m.el), err = t => { const e = g('#rErr'); e.textContent = t; e.hidden = false; return false; };
+      const title = g('#rTitle').value.trim(); if (!title) return err('El título es obligatorio.');
+      const ds = g('#rDate').value, ts = g('#rTime').value; if (!ds || !ts) return err('Indicá fecha y hora.');
+      const [y, mo, dd] = ds.split('-').map(Number), [hh, mm] = ts.split(':').map(Number);
+      const at = new Date(y, mo - 1, dd, hh, mm).getTime(); if (isNaN(at)) return err('La fecha u hora no es válida.');
+      const type = g('#rRep').value, every = parseInt(g('#rEvery').value, 10), unit = g('#rUnit').value;
+      if (type === 'custom' && !(every >= 1)) return err('El intervalo debe ser un número mayor a 0.');
+      const sn = parseInt(g('#rSnooze').value, 10); if (!(sn >= 1 && sn <= 10080)) return err('El tiempo de postergación debe estar entre 1 y 10080 minutos.');
+      const tDef = g('#rTask').value || null;
+      const dup = S.rems.find(r => r !== ed && r.state !== 'confirmed' && r.state !== 'disabled' && r.title.toLowerCase() === title.toLowerCase() && r.baseAt === at && (r.defId || null) === tDef);
+      if (dup && !(await confirmDlg('Posible duplicado', 'Ya existe un recordatorio activo con el mismo título, fecha y hora. ¿Crear otro igual?', 'Crear de todos modos'))) return false;
+      if (at < nowTs() - 60000 && !(await confirmDlg('Fecha pasada', 'La fecha y hora elegidas ya pasaron: la alerta se mostrará de inmediato. ¿Continuar?', 'Continuar'))) return false;
+      const rep = {type, every: type === 'custom' ? every : 1, unit: type === 'custom' ? unit : 'day'};
+      if (ed) {
+        Object.assign(ed, {title, desc: g('#rDesc').value.trim(), priority: g('#rPri').value, repeat: rep, defId: tDef, snoozeMin: sn, baseAt: at, nextAt: at, anchorDay: new Date(at).getDate(), state: 'active', alerting: false, updatedAt: nowTs()});
+        if (tDef !== ed.defId) ed.instId = null;
+        await save('reminders', ed); log('rem_modificado', {rem: ed, detail: `${fmtDT(at)} · ${repeatText(rep)} · prioridad ${ed.priority}`});
+      } else {
+        const r = {id: uid(), title, desc: g('#rDesc').value.trim(), priority: g('#rPri').value, repeat: rep, defId: tDef, instId: tDef && o.instId && o.defId === tDef ? o.instId : null, snoozeMin: sn,
+          baseAt: at, nextAt: at, anchorDay: new Date(at).getDate(), state: 'active', alerting: false, createdAt: nowTs(), updatedAt: nowTs(), lastFiredAt: null, lastConfirmedAt: null};
+        S.rems.push(r); await save('reminders', r); log('rem_creado', {rem: r, detail: `${fmtDT(at)} · ${repeatText(rep)} · prioridad ${r.priority}`});
+      }
+      toast('Recordatorio guardado', 'ok'); checkReminders(); refresh(); renderAlerts(); return true;
+    }}]});
+  $('#rRep', m.el).addEventListener('change', e => { $('#rCustom', m.el).hidden = e.target.value !== 'custom'; });
+}
+function snoozeDlg(r) {
+  const m = openModal({title: 'Posponer · ' + r.title, actions: [{label: 'Cancelar', cls: 'ghost'}], html: `<div class="a-btns" style="display:flex;gap:8px;flex-wrap:wrap">${cfg().snooze.map(x => `<button class="btn" data-min="${x}">${x} min</button>`).join('')}<input type="number" class="inp" id="sCustom" min="1" style="width:90px" value="${r.snoozeMin || cfg().snoozeCustom}"><button class="btn ghost" data-min="custom">Personalizado</button></div>`});
+  m.body.addEventListener('click', e => { const b = e.target.closest('[data-min]'); if (!b) return; const v = b.dataset.min === 'custom' ? $('#sCustom', m.el).value : b.dataset.min; if (snoozeReminder(r, v)) m.close(); });
+}
+async function reminderAction(r, a) {
+  switch (a) {
+    case 'confirm': confirmReminder(r); toast('Recordatorio confirmado', 'ok'); break;
+    case 'snooze': snoozeDlg(r); break;
+    case 'comments': openComments('reminder', r.id); break;
+    case 'edit': openReminderForm({edit: r}); break;
+    case 'toggle':
+      if (r.state === 'disabled') { r.state = 'active'; r.alerting = false; if (r.repeat.type !== 'none' && r.baseAt < nowTs()) { r.baseAt = nextOccurrence(r); } r.nextAt = Math.max(r.baseAt, r.state === 'snoozed' ? r.nextAt : 0); }
+      else { r.state = 'disabled'; r.alerting = false; }
+      save('reminders', r); log('rem_estado', {rem: r, detail: r.state === 'disabled' ? 'Desactivado' : 'Activado'}); refresh(); renderAlerts(); break;
+    case 'del':
+      if (await confirmDlg('Eliminar recordatorio', `¿Eliminar “${esc(r.title)}” y sus comentarios? Esta acción no se puede deshacer.`, 'Eliminar', true)) {
+        S.rems.splice(S.rems.indexOf(r), 1); remove('reminders', r.id);
+        S.comments.filter(c => c.parentKind === 'reminder' && c.parentId === r.id).forEach(c => { S.comments.splice(S.comments.indexOf(c), 1); remove('comments', c.id); });
+        log('rem_eliminado', {rem: r, detail: r.title}); refresh(); renderAlerts();
+      } break;
+  }
+}
+
+/* Resumen de inicio de jornada */
+function openSummary() {
+  const today = ymd(nowD()), cur = ymOf(nowD()), act = S.inst.filter(visible);
+  const todays = act.filter(i => i.type === 'daily' && i.period === today && i.status !== 'completada' && !i.slot);
+  const bindN = act.filter(i => i.slot && i.period === today && i.status !== 'completada').length;
+  const prev = act.filter(i => i.status !== 'completada' && isLate(i));
+  const soon = act.filter(i => i.status !== 'completada' && i.due && i.due >= today && Math.round((parseYmd(i.due) - parseYmd(today)) / 86400000) <= 7);
+  const rems = S.rems.filter(r => (r.state === 'active' || r.state === 'snoozed') && ymd(new Date(r.nextAt)) <= today).sort((a, b) => a.nextAt - b.nextAt);
+  const ul = (arr, f) => arr.length ? `<ul style="margin:4px 0 12px;padding-left:20px">${arr.map(x => `<li>${f(x)}</li>`).join('')}</ul>` : '<div class="muted small" style="margin:4px 0 12px">Nada por acá.</div>';
+  openModal({title: 'Resumen de inicio de jornada', wide: true, actions: [{label: 'Empezar', cls: 'primary'}], html: `
+    <h4 style="color:var(--navy)">Tareas de hoy (${todays.length}${bindN ? ` + ${bindN} revisiones del BIND` : ''})</h4>${ul(todays, i => esc(i.name))}
+    <h4 style="color:var(--red)">Pendientes de períodos anteriores (${prev.length})</h4>${ul(prev, i => `${esc(instTitle(i))} <span class="muted small">· ${i.type === 'daily' ? fmtDay(i.period) : esc(monthLabel(i.period))}</span>`)}
+    <h4 style="color:var(--orange)">Vencimientos próximos, 7 días (${soon.length})</h4>${ul(soon, i => `${esc(i.name)} <span class="muted small">· vence ${fmtDay(i.due)}</span>`)}
+    <h4 style="color:var(--navy)">Recordatorios activos de hoy o atrasados (${rems.length})</h4>${ul(rems, r => `${esc(r.title)} <span class="muted small">· ${fmtWhen(r.nextAt)}</span>`)}`});
+}
+
+/* ---------- 10) Configuración, respaldos ---------- */
+function dueText(d) {
+  const o = d.due || {mode: 'none'};
+  return ({none: 'Sin fecha', day: `Día ${o.day} del mes`, last: 'Último día del mes', lastbiz: 'Último día hábil', custom: 'Fecha personalizada (por mes)'})[o.mode];
+}
+function defRowsHTML(type) {
+  const arr = S.defs.filter(d => d.type === type).sort((a, b) => a.order - b.order);
+  return arr.map((d, k) => `<div class="def ${d.archived ? 'arch' : ''}" data-did="${d.id}"><div><b>${esc(d.name)}</b> ${d.special ? '<span class="b blue">Especial BIND</span>' : ''}${d.archived ? ' <span class="b">Archivada</span>' : ''}${type === 'monthly' ? `<div class="muted small">Vencimiento: ${dueText(d)}</div>` : ''}</div>
+    <div class="t-act"><button class="ibtn" data-s="up" ${k === 0 ? 'disabled' : ''} aria-label="Subir">${ic('up')}</button><button class="ibtn" data-s="down" ${k === arr.length - 1 ? 'disabled' : ''} aria-label="Bajar">${ic('down')}</button>
+    <button class="ibtn" data-s="edit">${ic('edit')} Editar</button><button class="ibtn" data-s="archive">${ic(d.archived ? 'restore' : 'archive')} ${d.archived ? 'Restaurar' : 'Archivar'}</button><button class="ibtn" data-s="delete">${ic('trash')}</button></div></div>`).join('');
+}
+function settingsHTML() {
+  const c = cfg(), b = c.bind;
+  return `
+  <div class="card"><div class="ch"><h3>Tareas diarias</h3><button class="btn sm" data-s="add" data-type="daily">${ic('plus')} Nueva</button></div>${defRowsHTML('daily')}</div>
+  <div class="card"><div class="ch"><h3>Tareas mensuales</h3><button class="btn sm" data-s="add" data-type="monthly">${ic('plus')} Nueva</button></div>${defRowsHTML('monthly')}
+    <div class="sub">Archivar oculta la tarea sin borrar su historial ni sus comentarios. Eliminar borra la tarea, sus instancias y sus comentarios (el historial de actividad se conserva).</div></div>
+  <div class="card"><div class="ch"><h3>Revisión del BIND</h3></div><div class="sec">
+    <div class="grid2"><label class="fld">Inicio de jornada<input type="time" data-set="bind.start" value="${b.start}"></label>
+    <label class="fld">Fin de jornada<input type="time" data-set="bind.end" value="${b.end}"></label>
+    <label class="fld">Intervalo (minutos)<input type="number" min="5" max="480" data-set="bind.interval" value="${b.interval}"></label>
+    <label class="fld">Revisiones pendientes<select data-set="bind.pending"><option value="grouped" ${b.pending === 'grouped' ? 'selected' : ''}>Alerta agrupada (una sola ventana)</option><option value="silent" ${b.pending === 'silent' ? 'selected' : ''}>Solo aviso en la pantalla (sin ventana)</option></select></label></div>
+    <div class="fld" style="margin-bottom:6px">Días laborales</div><div class="days">${DOW.map((n, k) => `<label><input type="checkbox" data-set="bind.day" data-v="${k}" ${b.days.includes(k) ? 'checked' : ''}> ${n}</label>`).join('')}</div>
+    <p class="muted small">Se generan ${bindSlots().length} revisiones por día (${bindSlots().join(', ')}). Cada una tiene su propio estado y comentarios. Un cambio de horarios se aplica a hoy sin tocar las revisiones ya completadas o comentadas.</p></div></div>
+  <div class="card"><div class="ch"><h3>Alertas y notificaciones</h3></div><div class="sec">
+    <div class="grid2"><label class="fld">Posponer predeterminado (min, separados por coma)<input type="text" data-set="snooze" value="${c.snooze.join(', ')}"></label>
+    <label class="fld">Posponer personalizado por defecto (min)<input type="number" min="1" max="10080" data-set="snoozeCustom" value="${c.snoozeCustom}"></label></div>
+    <label class="chkline" style="margin-bottom:12px"><input type="checkbox" data-set="sound" ${c.sound ? 'checked' : ''}> Sonido breve al activarse una alerta</label>
+    <div class="t-act" style="justify-content:flex-start"><button class="btn ghost" data-s="notif">${ic('bell')} Activar notificaciones del sistema</button><span class="muted small" style="align-self:center">Estado: ${typeof Notification === 'undefined' ? 'no disponible en este navegador' : Notification.permission === 'granted' ? (c.sysNotif ? 'activadas' : 'permitidas (desactivadas aquí)') : Notification.permission === 'denied' ? 'bloqueadas en el navegador' : 'sin permiso'}</span></div>
+    <div class="note" style="margin-top:12px"><b>Limitación real:</b> las alertas y notificaciones funcionan <u>mientras la pestaña esté abierta</u> (puede estar en segundo plano; los navegadores pueden frenar los temporizadores de pestañas inactivas o dispositivos suspendidos). Con el navegador cerrado no suena nada: al volver a abrir la app se revisan los recordatorios vencidos y se muestra una sola alerta por cada uno, sin duplicados.</div></div></div>
+  <div class="card"><div class="ch"><h3>Vencimientos y feriados</h3></div><div class="sec">
+    <label class="fld">Feriados (uno por línea, AAAA-MM-DD). Se usan para calcular el “último día hábil”; los fines de semana ya se excluyen.<textarea rows="3" data-set="holidays">${esc(c.holidays.join('\n'))}</textarea></label></div></div>
+  <div class="card"><div class="ch"><h3>Datos y copias de seguridad</h3></div><div class="sec">
+    <div class="note" style="margin-bottom:12px">Los datos viven en el almacenamiento (IndexedDB) de <b>este navegador y este dispositivo</b>. Se pierden si se borran los datos del sitio, se usa modo privado o se cambia de equipo. Exportá un respaldo con frecuencia. Último respaldo: <b>${S.meta.lastBackup ? fmtDT(S.meta.lastBackup) : 'nunca'}</b>.</div>
+    <div class="t-act" style="justify-content:flex-start"><button class="btn" data-s="export">${ic('download')} Exportar respaldo</button><button class="btn ghost" data-s="import">${ic('upload')} Importar respaldo</button><input type="file" id="fileImp" accept="application/json,.json" hidden></div>
+    <p class="muted small">Estado del almacenamiento: ${DB.ok ? 'IndexedDB activo' : '<b style="color:var(--red)">no disponible</b>'} · ${S.inst.length} tareas generadas · ${S.comments.length} comentarios · ${S.rems.length} recordatorios · ${S.hist.length} eventos.</p></div></div>
+  <div class="card"><div class="ch"><h3>Limitaciones técnicas</h3></div><div class="sec"><ul style="margin:0;padding-left:20px" class="small">
+    <li>Es un único archivo HTML: no puede ejecutarse en segundo plano ni enviar notificaciones con el navegador cerrado. Para eso haría falta una PWA con service worker y servidor (push), que no se incluye.</li>
+    <li>Las tareas diarias se generan al abrir la app cada día (no se crean retroactivamente los días en que no se abrió). Las mensuales sí se completan para los meses omitidos (hasta 12).</li>
+    <li>Los vencimientos “último día hábil” excluyen sábados, domingos y los feriados que cargues arriba.</li>
+    <li>El historial es un registro local editable técnicamente; no es una auditoría inalterable.</li>
+    <li>No hay integración con bancos ni sistemas contables: el BIND es solo un recordatorio.</li></ul></div></div>`;
+}
+async function editDefDlg(def, type) {
+  const isNew = !def, d = def || {name: '', due: {mode: 'none', day: 1}};
+  return new Promise(res => {
+    const m = openModal({title: isNew ? (type === 'daily' ? 'Nueva tarea diaria' : 'Nueva tarea mensual') : 'Editar tarea', onClose: () => res(), html: `
+      <label class="fld">Nombre *<input type="text" id="dfName" maxlength="160" value="${esc(d.name)}"></label>
+      ${(def ? def.type : type) === 'monthly' ? `<label class="fld">Vencimiento<select id="dfMode">${[['none', 'Sin fecha específica'], ['day', 'Día determinado del mes'], ['last', 'Último día del mes'], ['lastbiz', 'Último día hábil del mes'], ['custom', 'Fecha personalizada (se elige en cada mes)']].map(([v, l]) => `<option value="${v}" ${d.due.mode === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+      <label class="fld" id="dfDayW" ${d.due.mode === 'day' ? '' : 'hidden'}>Día del mes (1–31)<input type="number" id="dfDay" min="1" max="31" value="${d.due.day || 1}"></label>` : ''}
+      <div class="err" id="dfErr" hidden></div>`,
+      actions: [{label: 'Cancelar', cls: 'ghost'}, {label: 'Guardar', cls: 'primary', onClick: m => {
+        const name = $('#dfName', m.el).value.trim(), er = t => { const e = $('#dfErr', m.el); e.textContent = t; e.hidden = false; return false; };
+        if (!name) return er('El nombre es obligatorio.');
+        const ty = def ? def.type : type;
+        if (S.defs.some(x => x !== def && x.type === ty && !x.archived && x.name.toLowerCase() === name.toLowerCase())) return er('Ya existe una tarea con ese nombre.');
+        let due = d.due;
+        if (ty === 'monthly') {
+          const mode = $('#dfMode', m.el).value, day = parseInt(($('#dfDay', m.el) || {}).value, 10);
+          if (mode === 'day' && !(day >= 1 && day <= 31)) return er('El día debe estar entre 1 y 31.');
+          due = {mode, day: mode === 'day' ? day : (d.due.day || 1)};
+        }
+        if (isNew) {
+          const order = Math.max(0, ...S.defs.filter(x => x.type === ty).map(x => x.order)) + 1;
+          const nd = {id: ty[0].toUpperCase() + uid(), type: ty, name, order, archived: false, special: null, due, createdMonth: ymOf(nowD())};
+          S.defs.push(nd); save('taskDefs', nd); log('tarea_modificada', {def: nd, detail: 'Tarea creada'}); ensurePeriods();
+        } else {
+          const oldName = def.name, oldDue = JSON.stringify(def.due);
+          def.name = name; def.due = due; save('taskDefs', def);
+          if (oldName !== name) { S.inst.filter(i => i.defId === def.id && i.status !== 'completada' && (i.period === ymd(nowD()) || i.period === ymOf(nowD()))).forEach(i => { i.name = name; save('instances', i); }); log('tarea_modificada', {def, detail: `Renombrada: “${oldName}” → “${name}”`}); }
+          if (oldDue !== JSON.stringify(due)) {
+            S.inst.filter(i => i.defId === def.id && i.status !== 'completada' && !i.dueManual).forEach(i => { i.due = computeDue(def, i.period); save('instances', i); });
+            log('vencimiento', {def, detail: `Configuración: ${dueText(def)}`});
+          }
+        }
+        refresh(true); toast('Tarea guardada', 'ok'); return true;
+      }}]});
+    const sel = $('#dfMode', m.el); if (sel) sel.addEventListener('change', () => { $('#dfDayW', m.el).hidden = sel.value !== 'day'; });
+  });
+}
+async function settingsAction(a, el) {
+  const row = el.closest('[data-did]'), def = row && S.defs.find(d => d.id === row.dataset.did);
+  switch (a) {
+    case 'add': await editDefDlg(null, el.dataset.type); break;
+    case 'edit': await editDefDlg(def); break;
+    case 'up': case 'down': {
+      const sib = S.defs.filter(d => d.type === def.type).sort((x, y) => x.order - y.order), k = sib.indexOf(def), o = sib[k + (a === 'up' ? -1 : 1)];
+      if (o) { [def.order, o.order] = [o.order, def.order]; save('taskDefs', def); save('taskDefs', o); S.defs.sort((x, y) => x.order - y.order); log('tarea_modificada', {def, detail: 'Cambio de orden'}); refresh(true); } break; }
+    case 'archive':
+      def.archived = !def.archived; save('taskDefs', def); log('tarea_modificada', {def, detail: def.archived ? 'Tarea archivada' : 'Tarea restaurada'});
+      if (!def.archived) { def.createdMonth = def.createdMonth || ymOf(nowD()); ensurePeriods(); } refresh(true); break;
+    case 'delete':
+      if (await confirmDlg('Eliminar tarea', `¿Eliminar “${esc(def.name)}” junto con todas sus instancias y comentarios? Es preferible archivarla. El historial de actividad se conserva.`, 'Eliminar definitivamente', true)) {
+        const ins = S.inst.filter(i => i.defId === def.id), ids = new Set(ins.map(i => i.id));
+        ins.forEach(i => remove('instances', i.id));
+        S.inst = S.inst.filter(i => !ids.has(i.id)); reindex();
+        S.comments.filter(c => c.parentKind === 'instance' && ids.has(c.parentId)).forEach(c => remove('comments', c.id));
+        S.comments = S.comments.filter(c => !(c.parentKind === 'instance' && ids.has(c.parentId)));
+        S.rems.forEach(r => { if (r.defId === def.id) { r.defId = null; r.instId = null; save('reminders', r); } });
+        S.defs.splice(S.defs.indexOf(def), 1); remove('taskDefs', def.id);
+        log('tarea_modificada', {def, detail: 'Tarea eliminada'}); refresh(true);
+      } break;
+    case 'notif':
+      if (typeof Notification === 'undefined') { toast('Este navegador no admite notificaciones', 'err'); break; }
+      { const p = await Notification.requestPermission(); cfg().sysNotif = p === 'granted'; await saveSettings(); toast(p === 'granted' ? 'Notificaciones activadas' : 'Permiso no concedido', p === 'granted' ? 'ok' : 'err'); refresh(true); }
+      break;
+    case 'export': exportBackup(); break;
+    case 'import': $('#fileImp').click(); break;
+  }
+}
+function handleSetting(t) {
+  const k = t.dataset.set, c = cfg(), b = Object.assign({}, c.bind), bad = msg => { toast(msg, 'err'); refresh(true); };
+  switch (k) {
+    case 'bind.start': case 'bind.end': {
+      b[k.split('.')[1]] = t.value; if (!t.value || toMin(b.start) >= toMin(b.end)) return bad('La hora de inicio debe ser anterior a la de finalización.'); break; }
+    case 'bind.interval': {
+      const v = parseInt(t.value, 10); if (!(v >= 5 && v <= 480)) return bad('El intervalo debe estar entre 5 y 480 minutos.');
+      b.interval = v; if ((toMin(b.end) - toMin(b.start)) / v > 100) return bad('Demasiadas revisiones por día.'); break; }
+    case 'bind.day': { const v = Number(t.dataset.v); b.days = t.checked ? [...new Set([...b.days, v])].sort() : b.days.filter(x => x !== v); break; }
+    case 'bind.pending': b.pending = t.value; break;
+    case 'snooze': {
+      const arr = t.value.split(/[,\s]+/).map(Number).filter(n => n >= 1 && n <= 10080);
+      if (!arr.length) return bad('Ingresá al menos un intervalo válido (minutos).'); c.snooze = [...new Set(arr)].slice(0, 6); break; }
+    case 'snoozeCustom': { const v = parseInt(t.value, 10); if (!(v >= 1 && v <= 10080)) return bad('Valor inválido.'); c.snoozeCustom = v; break; }
+    case 'sound': c.sound = t.checked; break;
+    case 'holidays': {
+      const lines = t.value.split(/\s+/).filter(Boolean);
+      if (lines.some(l => !/^\d{4}-\d{2}-\d{2}$/.test(l) || isNaN(parseYmd(l)))) return bad('Hay feriados con formato inválido (usá AAAA-MM-DD).');
+      c.holidays = [...new Set(lines)].sort();
+      S.inst.filter(i => i.type === 'monthly' && i.status !== 'completada' && !i.dueManual).forEach(i => { const d = defOf(i); if (d) { i.due = computeDue(d, i.period); save('instances', i); } }); break; }
+  }
+  if (k.startsWith('bind.')) { c.bind = b; syncBindToday(); log('tarea_modificada', {task: 'Revisión del BIND', detail: `Configuración: ${b.start}–${b.end} cada ${b.interval} min`}); }
+  saveSettings(); refresh(true);
+}
+function exportBackup() {
+  const data = {app: 'checklist-admin', version: 1, exportedAt: new Date().toISOString(), data: {
+    taskDefs: S.defs, instances: S.inst, comments: S.comments, reminders: S.rems, history: S.hist,
+    meta: Object.entries(S.meta).map(([key, value]) => ({key, value}))}};
+  const blob = new Blob([JSON.stringify(data, null, 1)], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `respaldo-checklist-${ymd(nowD())}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  setMeta('lastBackup', nowTs()); log('sistema', {task: 'Respaldo', detail: 'Exportación de datos'}); toast('Respaldo exportado', 'ok'); refresh(true);
+}
+function validateBackup(o) {
+  const errs = [], isO = x => x && typeof x === 'object' && !Array.isArray(x);
+  if (!isO(o) || o.app !== 'checklist-admin') return ['El archivo no es un respaldo de esta aplicación.'];
+  if (typeof o.version !== 'number' || o.version > 1) errs.push('Versión de respaldo no compatible.');
+  const d = o.data; if (!isO(d)) return errs.concat('Falta el bloque de datos.');
+  for (const k of STORES) if (!Array.isArray(d[k])) errs.push(`Falta la sección “${k}” o no es una lista.`);
+  if (errs.length) return errs;
+  const chk = (arr, name, fn) => arr.forEach((x, n) => { if (!isO(x) || typeof (name === 'meta' ? x.key : x.id) !== 'string' || !fn(x)) errs.push(`${name} #${n + 1}: registro inválido.`); });
+  chk(d.taskDefs, 'taskDefs', x => ['daily', 'monthly'].includes(x.type) && typeof x.name === 'string' && typeof x.order === 'number');
+  chk(d.instances, 'instances', x => typeof x.defId === 'string' && typeof x.period === 'string' && Object.keys(STATUS).includes(x.status));
+  chk(d.comments, 'comments', x => typeof x.text === 'string' && typeof x.parentId === 'string' && typeof x.createdAt === 'number');
+  chk(d.reminders, 'reminders', x => typeof x.title === 'string' && typeof x.baseAt === 'number' && typeof x.nextAt === 'number' && isO(x.repeat) && ['baja', 'media', 'alta'].includes(x.priority));
+  chk(d.history, 'history', x => typeof x.ts === 'number' && typeof x.type === 'string');
+  chk(d.meta, 'meta', () => true);
+  return errs;
+}
+async function importFile(file) {
+  let obj;
+  try { obj = JSON.parse(await file.text()); } catch (e) { return showImportErr(['El archivo no es un JSON válido.']); }
+  const errs = validateBackup(obj); if (errs.length) return showImportErr(errs);
+  const d = obj.data;
+  const ok = await confirmDlg('Importar respaldo', `Se <b>reemplazarán todos los datos actuales</b> por los del archivo (${d.taskDefs.length} tareas, ${d.instances.length} instancias, ${d.comments.length} comentarios, ${d.reminders.length} recordatorios, ${d.history.length} eventos; respaldo del ${esc(String(obj.exportedAt || '').slice(0, 10))}). Esta acción no se puede deshacer; si querés conservar lo actual, exportalo primero.`, 'Reemplazar datos', true);
+  if (!ok) return;
+  try {
+    const meta = d.meta.slice(); if (!meta.some(m => m.key === 'seeded')) meta.push({key: 'seeded', value: true});
+    await DB.replaceAll({taskDefs: d.taskDefs, instances: d.instances, comments: d.comments, reminders: d.reminders, history: d.history, meta});
+    if (!DB.ok) { S.defs = d.taskDefs; S.inst = d.instances; S.comments = d.comments; S.rems = d.reminders; S.hist = d.history; S.meta = Object.fromEntries(meta.map(m => [m.key, m.value])); S.meta.settings = Object.assign(DEFAULT_SETTINGS(), S.meta.settings || {}); reindex(); }
+    else await loadState();
+    ensurePeriods(); log('sistema', {task: 'Respaldo', detail: 'Importación de datos'}); broadcast(); refresh(true); renderAlerts(); toast('Respaldo importado correctamente', 'ok');
+  } catch (e) { showImportErr(['No se pudo escribir en el almacenamiento: ' + ((e && e.message) || e)]); }
+}
+function showImportErr(errs) {
+  openModal({title: 'No se pudo importar', html: `<p style="margin-top:0">El archivo fue rechazado y <b>no se modificó ningún dato</b>.</p><ul>${errs.slice(0, 6).map(e => `<li>${esc(e)}</li>`).join('')}</ul>${errs.length > 6 ? `<div class="muted small">…y ${errs.length - 6} problema(s) más.</div>` : ''}`, actions: [{label: 'Cerrar', cls: 'primary'}]});
+}
+
+/* ---------- Eventos de la interfaz ---------- */
+document.addEventListener('click', async e => {
+  const nav = e.target.closest('[data-nav]'); if (nav) { setView(nav.dataset.nav); return; }
+  const top = e.target.closest('[data-top]');
+  if (top) {
+    const k = top.dataset.top;
+    if (k === 'newRem') openReminderForm();
+    if (k === 'summary') openSummary();
+    if (k === 'focus') { UI.focus = !UI.focus; setMeta('ui', {focus: UI.focus, hideDone: UI.hideDone}); refresh(true); }
+    if (k === 'dismissWarn') { setMeta('warnDismissed', true); refresh(); }
+    return;
+  }
+});
+$('#main').addEventListener('click', async e => {
+  const ra = e.target.closest('[data-ra]');
+  if (ra) { const r = S.rems.find(x => x.id === ra.closest('[data-rid]').dataset.rid); if (r) reminderAction(r, ra.dataset.ra); return; }
+  const s = e.target.closest('[data-s]'); if (s) { settingsAction(s.dataset.s, s); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const row = a.closest('[data-id]'), id = row && row.dataset.id, i = id && S.inst.find(x => x.id === id);
+  switch (a.dataset.act) {
+    case 'drawer': UI.drawer = UI.drawer === id ? null : id; refresh(); break;
+    case 'setStatus': if (i) { UI.drawer = null; setStatus(i, a.dataset.st); if (i.status === a.dataset.st) refresh(); } break;
+    case 'comments': i && openComments('instance', i.id); break;
+    case 'taskRems': i && openTaskRems(i.id); break;
+    case 'detail': i && openDetail(i.id); break;
+    case 'newRem': openReminderForm(); break;
+    case 'histClear': UI.hist = {day: '', month: '', task: '', type: '', q: '', limit: 200}; UI.built = null; refresh(true); break;
+    case 'histMore': UI.hist.limit += 200; refresh(); break;
+  }
+});
+$('#main').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.k === 'q') { UI.q = t.value; $('#list').innerHTML = listHTML(); }
+  if (t.dataset.h === 'q') { UI.hist.q = t.value; UI.hist.limit = 200; $('#list').innerHTML = listHTML(); }
+});
+$('#main').addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.k === 'filter') { UI.filter = t.value; $('#list').innerHTML = listHTML(); }
+  if (t.dataset.k === 'remFilter') { UI.remFilter = t.value; $('#list').innerHTML = listHTML(); }
+  if (t.dataset.k === 'hideDone') { UI.hideDone = t.checked; setMeta('ui', {focus: UI.focus, hideDone: UI.hideDone}); $('#list').innerHTML = listHTML(); }
+  if (t.dataset.h && t.dataset.h !== 'q') { UI.hist[t.dataset.h] = t.value; if (t.dataset.h === 'day' && t.value) UI.hist.month = ''; UI.hist.limit = 200; $('#list').innerHTML = listHTML(); }
+  if (t.dataset.set) handleSetting(t);
+  if (t.id === 'fileImp' && t.files[0]) { importFile(t.files[0]); t.value = ''; }
+});
+
+/* ---------- 11) Arranque y temporizador ---------- */
+function updateClock() {
+  const d = nowD(); $('#clockT').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function tick() {
+  try {
+    updateClock();
+    const day = ymd(nowD());
+    if (day !== RT.day) { RT.day = day; ensurePeriods(); refresh(); }
+    const f = checkReminders(); checkBind();
+    renderAlerts();
+    const min = Math.floor(nowTs() / 60000);
+    if (min !== RT.minute || f) { RT.minute = min; refresh(); }
+  } catch (e) {
+    console.error(e);
+    if (nowTs() - RT.lastErr > 5000) { RT.lastErr = nowTs(); toast('Ocurrió un error interno. Podés seguir usando la app.', 'err'); }
+  }
+}
+window.addEventListener('error', () => { /* una falla no debe dejar la pantalla bloqueada */ if (!$('#alertRoot').querySelector('[data-alert]')) $('#alertRoot').innerHTML = ''; });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+window.addEventListener('focus', tick);
+if (bc) bc.onmessage = async () => { await loadState(); reindex(); refresh(); renderAlerts(); };
+
+async function boot() {
+  await DB.open();
+  await loadState(); await seedIfNeeded();
+  const u = S.meta.ui || {}; UI.focus = !!u.focus; UI.hideDone = !!u.hideDone;
+  RT.day = ymd(nowD()); ensurePeriods();
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  refresh(true); updateClock();
+  checkReminders(); checkBind(); renderAlerts();
+  if (S.meta.lastSummary !== RT.day) { await setMeta('lastSummary', RT.day); openSummary(); }
+  RT.timer = setInterval(tick, 1000);
+}
+window.App = {S, UI, RT, DB, boot, tick, ensurePeriods, nextOccurrence, confirmReminder, snoozeReminder, checkReminders, checkBind, addComment, setStatus, applyStatus, exportBackup, validateBackup, importFile, openReminderForm, bindSlots, computeDue, setClock: f => { clock = f; }, loadState, effStatus, remsFor, syncBindToday, refresh, openComments, openDetail, setView, handleSetting};
+if (!window.__NO_BOOT__) boot();
+</script>
+</body>
+</html>
